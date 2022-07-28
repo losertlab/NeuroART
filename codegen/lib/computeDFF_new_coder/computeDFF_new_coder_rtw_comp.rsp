@@ -1,0 +1,7 @@
+-I"C:\Users\Losert Lab\Desktop\RTapp_v12\codegen\lib\computeDFF_new_coder"
+-I"C:\Users\Losert Lab\Desktop\RTapp_v12"
+-I"C:\Program Files\MATLAB\R2019b\extern\include"
+-I"C:\Program Files\MATLAB\R2019b\simulink\include"
+-I"C:\Program Files\MATLAB\R2019b\rtw\c\src"
+-I"C:\Program Files\MATLAB\R2019b\rtw\c\src\ext_mode\common"
+-I"C:\Program Files\MATLAB\R2019b\rtw\c\ert"

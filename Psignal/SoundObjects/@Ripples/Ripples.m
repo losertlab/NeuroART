@@ -1,0 +1,19 @@
+function o = Ripples(varargin)
+s = SoundObject ('Ripples', 0, 0.4, 0.8, {}, 1, {'Rates','popupmenu','24',...
+    'FrequencyRange','popupmenu','A:4000-48000 Hz','Duration','edit',3});
+o.Duration = 3;
+o.FrequencyRange = 'A:4000-48000 Hz';
+o.Rates = '24';
+o.Params.LowestFrequency = 4000;
+o.Params.HighestFrequency = 48000;
+o.Params.NumberOfComponents = 500;
+o.Params.HarmonicallySpaced = 0;
+o.Params.SpectralPowerDecay = 0;
+o.Params.ComponentRandomPhase = 1;
+o.Params.TimeDuration = 3;
+o.Params.RippleAmplitude = {1 1 1 1 1 1};
+o.Params.Scales = {1.4 1.4 1.4 1.4 1.4 1.4};
+o.Params.Rates = {8:8:48};
+o.Params.Phase = {0 0 0 0 0 0};
+o = class(o,'Ripples',s);
+o = ObjUpdate (o);

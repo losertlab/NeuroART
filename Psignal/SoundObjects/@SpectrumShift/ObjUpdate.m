@@ -1,0 +1,9 @@
+function o = ObjUpdate (o)
+LowFrequency = ifstr2num(get(o,'LowFrequency'));
+HighFrequency = ifstr2num(get(o,'HighFrequency'));
+NumShifts = ifstr2num(get(o,'NumShifts'));
+FreqShift = ifstr2num(get(o,'FreqShift'));
+Freq = linspace(FreqShift,FreqShift*NumShifts,NumShifts)';
+Names=cellstr(num2str(Freq));
+o = set(o,'Names',Names);
+o = set(o,'MaxIndex',length(Names));

@@ -1,0 +1,6 @@
+function [cameraToSlm, cameraToPmt] = ...
+        calibrate(cameraPointPatternImg, fakePointPatternImg, ...
+                  cameraNaturalImg, pmtNaturalImg)
+    cameraToSlm = register(cameraPointPatternImg, fakePointPatternImg);
+    cameraToPmt = register(cameraNaturalImg, pmtNaturalImg);
+end
