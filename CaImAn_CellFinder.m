@@ -11,7 +11,7 @@ function [extracted_centroids,ind_corr,ind_cnn,ind_exc] = CaImAn_CellFinder(Y)
 
 tst = tic;
 
-addpath(genpath('utilities'));
+addpath(genpath('caiman'));
 addpath(genpath('deconvolution'));
  
 if ~isa(Y,'single');    Y = single(Y);  end         % convert to single
