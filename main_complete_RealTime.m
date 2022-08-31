@@ -1,5 +1,5 @@
 close all
-% clear
+clear
 
 addpath(genpath('utilities'));
 addpath(genpath('Psignal'));
@@ -75,8 +75,8 @@ addpath(genpath('BNS_SLM'));
 % dataPath = 'E:\NeuroART\';
 dataPath = [pwd, filesep];  % set datapath to current folder
 
-inputDialogRT; % get input parameters from the user
-if Cancelled
+[inputParams, canceled] = inputDialogRT(dataPath); % get input parameters from the user
+if canceled
     return;
 end
 
@@ -390,3 +390,5 @@ r_display = floor(r_pixels*0.4); % display smaller size patches
 realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,exptId,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, numChannels, scope,imgType,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
 rmpath(genpath('utilities'));
 rmpath(genpath('Psignal')); % path to Psignal folder
+
+clear

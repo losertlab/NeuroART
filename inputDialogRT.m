@@ -3,6 +3,10 @@
 % Last Updated: May 5 2010
 %
 % Updated for additional functions F. Hatz 2013
+function [inputParams, canceled] = inputDialogRT(dataPath)
+    inputParams =  {};
+    canceled = true;
+
 
 Title = 'Input Parameters';
 %%%% SETTING DIALOG OPTIONS
@@ -51,7 +55,7 @@ Formats(4,1).size = 250; %[-1 0];
 % parts = strsplit(pwd, filesep);
 parts = strsplit(dataPath, filesep);
 parent_folder = strjoin(parts(1:end-1), filesep);
-DefAns.IMGFOLDER = 'C:\Users\Losert Lab\Documents\Data';
+% DefAns.IMGFOLDER = 'C:\Users\Losert Lab\Documents\Data';
 
 Prompt(end+1,:) = {'Image file name','IMG',[]};
 Formats(5,1).type = 'edit';
@@ -139,7 +143,7 @@ DefAns.CWINF = 5;
 % Formats(7,1).size = 100;
 % DefAns.FQ = 30;
 
-[Answer,Cancelled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
+[inputParams,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
 
 clear d DefAns files Formats Options Prompt Title
 
@@ -239,3 +243,4 @@ clear d DefAns files Formats Options Prompt Title
 % DefAns.X = pi;
 % DefAns.Y = 4;
 % DefAns.XY = DefAns.X*DefAns.Y;
+end
