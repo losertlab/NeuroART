@@ -87,33 +87,33 @@ winSizeSeconds = 20; %5       % the window size (in seconds) considered to calcu
 percent = 50; % percentile considered to calculate the baseline fluorescence intensity
 dftResolution = 1;
 
-r = Answer.R; % average radius of ROIs (in microns)
+r = inputParams.R; % average radius of ROIs (in microns)
 
-displayWin = Answer.DISPLAY; % Number of frames to be displayed at a time in the DF/F plots
-exptId = Answer.EXID; % experiment ID
-if Answer.FORMAT == 1
+displayWin = inputParams.DISPLAY; % Number of frames to be displayed at a time in the DF/F plots
+exptId = inputParams.EXID; % experiment ID
+if inputParams.FORMAT == 1
     imgType = '.raw';
 else
     imgType = '.tif';
 end
-ImageFile = [Answer.IMGFOLDER, filesep, Answer.IMG, imgType]; % The file that contains all the images
-numChannels = Answer.NUMCHAN; % Number of channels
-scope = Answer.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
+ImageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, imgType]; % The file that contains all the images
+numChannels = inputParams.NUMCHAN; % Number of channels
+scope = inputParams.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
 
 def_initialBatchSize = 600; % default values for the input dialog
 def_BatchSize = 1000;
 
-inputDialog1; % initial batch settings
-if Cancelled1
+[batchSettingsParams, canceled] = batchSettingsDialog(def_initialBatchSize, def_BatchSize, numChannels); % initial batch settings
+if canceled
     return;
 end
 
-start_Frame = Answer1.START; % starting frame of the initial batch
-last_init_Frame = Answer1.END; % ending frame of the initial batch
+start_Frame = batchSettingsParams.START; % starting frame of the initial batch
+last_init_Frame = batchSettingsParams.END; % ending frame of the initial batch
 numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
-batch_size = Answer1.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
-gap = Answer1.GAP; % Frequency of updating the figures (e.g. every 15 frames)
-greenChannel = Answer1.GREENCHAN; % Make this automatically detected
+batch_size = batchSettingsParams.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
+gap = batchSettingsParams.GAP; % Frequency of updating the figures (e.g. every 15 frames)
+greenChannel = batchSettingsParams.GREENCHAN; % Make this automatically detected
 numImagesToRead = numInitFrames + batch_size;
 %moved from below by AVS
 frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
@@ -123,7 +123,7 @@ psignalFile = '';
 JiSignalInfo = [];
 norm_meanRedIMG = [];
 
-if Answer.RF == 1 % Analyzing receptive fields
+if inputParams.RF == 1 % Analyzing receptive fields
      promptMessage = sprintf('Do you have Ji Signal Files?');
      button = questdlg(promptMessage, 'Tuning Analysis', 'Yes', 'No', 'Yes');
      if strcmpi(button, 'Yes')
@@ -211,7 +211,7 @@ fprintf('Initial aquisition took %.4f seconds\n',tstop);
 
 RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(frameBlock), 'uint16');
 
-if Answer.RCHAN == 1 % if the red channel is not available
+if inputParams.RCHAN == 1 % if the red channel is not available
     for j = 1:length(frameBlock)
         % using Fourier transformation of images for registration
 %         error = dftregistration_coder_mex(imTemplate,fft2(IMG(:,:,j)),dftResolution);
@@ -233,19 +233,19 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
 %             tx(j) = error(4);
 %         end
 %     else
-%         redPath = Answer2.INTBATCH;
-%         RedImgseq = Answer2.IMGSEQ;
+%         redPath = inputParams2.INTBATCH;
+%         RedImgseq = inputParams2.IMGSEQ;
 %         cd(redPath)
 %         
 %         files = dir([RedImgseq '*.raw']);
         RedIMG = nan(exptVars.dimX,exptVars.dimY,length(frameBlock)); %% change to length(fileInd:length(files))
         redID = 2;
-        if Answer1.GREENCHAN == 2
+        if batchSettingsParams.GREENCHAN == 2
             redID = 1;
         end
         
         for i = 1:length(frameBlock)
-            fName = fullfile(Answer.IMGFOLDER, [Answer.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' imgType]); % Format of the Bruker tif filenames 
+            fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' imgType]); % Format of the Bruker tif filenames 
             RedIMG(:,:,i)  = imread(fName);
 %             fh1 = fopen(files(start_Frame-1+i).name); % read raw image
 %             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
@@ -299,7 +299,7 @@ fprintf('Initial aquisition and registration took %.4f seconds\n',tstop);
 iStart = tic;
 % promptMessage = sprintf('Select the method for cell finding');
 % button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
-if Answer.CFIND == 1 % Manual
+if inputParams.CFIND == 1 % Manual
 %     meanIMG = std(double(RegIMG),0,3); % Mean image for cell center clicking
     meanIMG = mean(double(RegIMG),3); % Mean image for cell center clicking
     norm_meanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
@@ -310,7 +310,7 @@ if Answer.CFIND == 1 % Manual
     cell_centroids(:,1) = yc;
     cell_centroids(:,2) = xc;
     clear xc yc
-elseif Answer.CFIND == 4 % From File
+elseif inputParams.CFIND == 4 % From File
     [file,path] = uigetfile; % select the .mat file which contains the variable, "ptsIdx": column 2 --> x, column 3 --> y coordinates
     if file == 0
         fprintf('No file was selected ... \n');
@@ -320,7 +320,7 @@ elseif Answer.CFIND == 4 % From File
         cell_centroids(:,1) = ptsIdx(:,2); %yc
         cell_centroids(:,2) = ptsIdx(:,3); %xc
     end
-elseif Answer.CFIND == 3 % Cite-on
+elseif inputParams.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
     [~,~] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(frameBlock)) ' -p ' ImageFile]);
     T = readtable('cell_coordinates.csv');
@@ -344,7 +344,7 @@ delete(gcp('nocreate'));
 %% Compute DF/F
 
 neuropilSubPercent = 70; % use this default value for now
-if Answer.ROI == 1 % no filled ROIs
+if inputParams.ROI == 1 % no filled ROIs
 %     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,exptId,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,percent); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder_mex(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),percent,neuropilSubPercent);   
 else
@@ -360,16 +360,16 @@ fprintf('total execution time for cell finding is %.4f seconds\n',tstop);
 
 mst = 1;
 mstWin = 0; % This default value corresponds to cumulative analysis
-if Answer.NET == 2 % Correlations method
+if inputParams.NET == 2 % Correlations method
     mst = 0;
 end
 
-if Answer.CWIN == 2 % Using a shorter (fixed) window size
+if inputParams.CWIN == 2 % Using a shorter (fixed) window size
     shortWindow = 1;
-    mstWin = floor((Answer.CWINF)*imagingFreq); % max. allowed size = currently available number of frames
+    mstWin = floor((inputParams.CWINF)*imagingFreq); % max. allowed size = currently available number of frames
 end
     
-clear Answer Cancelled Answer1 Cancelled1
+clear inputParams canceled batchSettingsParams Cancelled1
 
 %% Check whether enough number of frames are available
 
