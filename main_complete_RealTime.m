@@ -118,25 +118,9 @@ numImagesToRead = numInitFrames + batch_size;
 %moved from below by AVS
 frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
 
-thorSyncFile = '';
-psignalFile = '';
-JiSignalInfo = [];
 norm_meanRedIMG = [];
 
-if inputParams.RF == 1 % Analyzing receptive fields
-     promptMessage = sprintf('Do you have Ji Signal Files?');
-     button = questdlg(promptMessage, 'Tuning Analysis', 'Yes', 'No', 'Yes');
-     if strcmpi(button, 'Yes')
-         [file,path] = uigetfile('*.mat','Please select the JiSignal file','stim_seq_210402_tones.mat');
-         JiSignalFile = [path,file];
-         JiSignalInfo = load(JiSignalFile).preset_stim_seq;
-     else
-         [file,path] = uigetfile('*.h5','Please select the thorSync file','Episode001.h5');
-         thorSyncFile = [path,file];
-         [file,path] = uigetfile('*.mat','Please select the pSignal file','RND_352r_2020_03_07_Phys_1.mat');
-         psignalFile = [path,file];
-     end
-end
+[thorSyncFile, psignalFile, JiSignalInfo] = rfDialog(inputParams.RF);
 
 %% Read the frames in real time
 
@@ -233,8 +217,8 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
 %             tx(j) = error(4);
 %         end
 %     else
-%         redPath = inputParams2.INTBATCH;
-%         RedImgseq = inputParams2.IMGSEQ;
+%         redPath = Answer2.INTBATCH;
+%         RedImgseq = Answer2.IMGSEQ;
 %         cd(redPath)
 %         
 %         files = dir([RedImgseq '*.raw']);
