@@ -80,52 +80,24 @@ if canceled
     return;
 end
 
-workingDir = pwd;
-symmFLAG = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5
-smoothwin = 9; %3             % window size used to smooth fluorescence intensity (F) traces
-winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
-percent = 50; % percentile considered to calculate the baseline fluorescence intensity
-dftResolution = 1;
+[batchSettingsParams, canceled] = batchSettingsDialog(inputParams.NUMCHAN); % initial batch settings
+if canceled
+    return;
+end
 
-r = inputParams.R; % average radius of ROIs (in microns)
+[thorSyncFile, psignalFile, JiSignalInfo] = rfDialog(inputParams.RF);
 
-displayWin = inputParams.DISPLAY; % Number of frames to be displayed at a time in the DF/F plots
-exptId = inputParams.EXID; % experiment ID
+%% Read the frames in real time
 if inputParams.FORMAT == 1
     imgType = '.raw';
 else
     imgType = '.tif';
 end
+exptId = inputParams.EXID; % experiment ID
 ImageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, imgType]; % The file that contains all the images
-numChannels = inputParams.NUMCHAN; % Number of channels
 scope = inputParams.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
-
-def_initialBatchSize = 600; % default values for the input dialog
-def_BatchSize = 1000;
-
-[batchSettingsParams, canceled] = batchSettingsDialog(def_initialBatchSize, def_BatchSize, numChannels); % initial batch settings
-if canceled
-    return;
-end
-
-start_Frame = batchSettingsParams.START; % starting frame of the initial batch
-last_init_Frame = batchSettingsParams.END; % ending frame of the initial batch
-numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
-batch_size = batchSettingsParams.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
-gap = batchSettingsParams.GAP; % Frequency of updating the figures (e.g. every 15 frames)
-greenChannel = batchSettingsParams.GREENCHAN; % Make this automatically detected
-numImagesToRead = numInitFrames + batch_size;
-%moved from below by AVS
-frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
-
-norm_meanRedIMG = [];
-
-[thorSyncFile, psignalFile, JiSignalInfo] = rfDialog(inputParams.RF);
-
-%% Read the frames in real time
-
 % if (scope==2 || scope==3) % Bruker system
-%     job = batch(@BrukerReadWriteRaw,0,{ImageFile,numChannels,exptId,scope});
+%     job = batch(@BrukerReadWriteRaw,0,{ImageFile,inputParams.NUMCHAN,exptId,scope});
 %     %modified by GDS on 6/9/2021
 %     pause(10.0);
 %     %end modification
@@ -160,8 +132,18 @@ exptVars = xmlVersionCheck(XML);
 
 % load('exptVars_RT_test1.mat'); % only for testing
 
+start_Frame = batchSettingsParams.START; % starting frame of the initial batch
+last_init_Frame = batchSettingsParams.END; % ending frame of the initial batch
+numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
+
+greenChannel = batchSettingsParams.GREENCHAN; % Make this automatically detected
+%moved from below by AVS
+frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
+
 imagingFreq = exptVars.frameRate;
+winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
 dffwindow = floor(imagingFreq * winSizeSeconds); % 600 or [i-300, i+300]
+r = inputParams.R; % average radius of ROIs (in microns)
 r_pixels = round(r/exptVars.micronsPerPixel);
 
 if (dffwindow > numInitFrames)
@@ -177,7 +159,7 @@ frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
 
 %% Read the frames in iteratively
 
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,greenChannel,numChannels,scope,imgType);
+[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,greenChannel,inputParams.NUMCHAN,scope,imgType);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
@@ -195,6 +177,8 @@ fprintf('Initial aquisition took %.4f seconds\n',tstop);
 
 RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(frameBlock), 'uint16');
 
+dftResolution = 1;
+norm_meanRedIMG = [];
 if inputParams.RCHAN == 1 % if the red channel is not available
     for j = 1:length(frameBlock)
         % using Fourier transformation of images for registration
@@ -239,7 +223,7 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
    
         clear files
 
-        cd(workingDir)
+        cd(pwd)
 
         I = (mean(RedIMG(:,:,1:length(frameBlock)),3)); % Mean image
         fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
@@ -328,6 +312,7 @@ delete(gcp('nocreate'));
 %% Compute DF/F
 
 neuropilSubPercent = 70; % use this default value for now
+percent = 50; % percentile considered to calculate the baseline fluorescence intensity
 if inputParams.ROI == 1 % no filled ROIs
 %     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,exptId,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,percent); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder_mex(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),percent,neuropilSubPercent);   
@@ -358,6 +343,7 @@ clear inputParams canceled batchSettingsParams Cancelled1
 %% Check whether enough number of frames are available
 
 numFrames = frameid - 1; % number of frames read upto now
+displayWin = inputParams.DISPLAY; % Number of frames to be displayed at a time in the DF/F plots
 if (displayWin > numFrames)
     promptMessage = sprintf('DF/F display window is larger than the available number of frames');
     msgbox(promptMessage,'Error','error');  
@@ -371,7 +357,12 @@ if (mstWin > numFrames)
 end
 
 r_display = floor(r_pixels*0.4); % display smaller size patches
-realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,exptId,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, numChannels, scope,imgType,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
+symmFLAG = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5
+smoothwin = 9; %3             % window size used to smooth fluorescence intensity (F) traces
+batch_size = batchSettingsParams.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
+gap = batchSettingsParams.GAP; % Frequency of updating the figures (e.g. every 15 frames)
+
+realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,exptId,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, inputParams.NUMCHAN, scope,imgType,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
 rmpath(genpath('utilities'));
 rmpath(genpath('Psignal')); % path to Psignal folder
 

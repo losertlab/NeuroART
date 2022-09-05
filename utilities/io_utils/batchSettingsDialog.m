@@ -3,7 +3,7 @@
 % Last Updated: May 5 2010
 %
 % Updated for additional functions F. Hatz 2013
-function [batchSettingsParams, canceled] = batchSettingsDialog(def_initialBatchSize, def_BatchSize, numChannels)
+function [batchSettingsParams, canceled] = batchSettingsDialog(numChannels)
     Title = 'Initial Batch Settings';
     %%%% SETTING DIALOG OPTIONS
     % Options.WindowStyle = 'modal';
@@ -31,14 +31,14 @@ function [batchSettingsParams, canceled] = batchSettingsDialog(def_initialBatchS
     Formats(2,1).format = 'integer';
     Formats(2,1).limits = [1 5000]; 
     Formats(2,1).size = 100;
-    DefAns.END = def_initialBatchSize;
+    DefAns.END = 600;
     
     Prompt(end+1,:) = {'Max. number of frames','BSIZE','(after initial batch)'};
     Formats(3,1).type = 'edit';
     Formats(3,1).format = 'integer';
     Formats(3,1).limits = [100 100000]; 
     Formats(3,1).size = 100;
-    DefAns.BSIZE = max(100,def_BatchSize);
+    DefAns.BSIZE = 1000;
     % 
     Prompt(end+1,:) = {'Figure updating frequency','GAP','frames'};
     Formats(4,1).type = 'edit';
