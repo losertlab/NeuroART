@@ -88,21 +88,16 @@ end
 [thorSyncFile, psignalFile, JiSignalInfo] = rfDialog(inputParams.RF);
 
 %% Read the frames in real time
-if inputParams.FORMAT == 1
-    imgType = '.raw';
-else
-    imgType = '.tif';
-end
-exptId = inputParams.EXID; % experiment ID
-ImageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, imgType]; % The file that contains all the images
-scope = inputParams.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
-% if (scope==2 || scope==3) % Bruker system
-%     job = batch(@BrukerReadWriteRaw,0,{ImageFile,inputParams.NUMCHAN,exptId,scope});
+
+ImageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, inputParams.FORMAT]; % The file that contains all the images
+% 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
+% if (inputParams.SCOPE==2 || inputParams.SCOPE==3) % Bruker system
+%     job = batch(@BrukerReadWriteRaw,0,{ImageFile,inputParams.NUMCHAN,inputParams.EXID,inputParams.SCOPE});
 %     %modified by GDS on 6/9/2021
 %     pause(10.0);
 %     %end modification
 % else
-%     job = batch(@realTimeReadXML,0,{ImageFile,workingDir,exptId});
+%     job = batch(@realTimeReadXML,0,{ImageFile,workingDir,inputParams.EXID});
 % end
 
 %% Reading experimental parameters and motion correction of the initial batch
@@ -110,7 +105,7 @@ scope = inputParams.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker 
 XML = danParseXML('Experiment.xml');
 exptVars = xmlVersionCheck(XML);
 
-% exptData = strcat('exptVars_',exptId,'.mat');
+% exptData = strcat('exptVars_',inputParams.EXID,'.mat');
 
 % j = 0;
 % while j < 3000 % Time out after 30 seconds
@@ -159,7 +154,7 @@ frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
 
 %% Read the frames in iteratively
 
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,greenChannel,inputParams.NUMCHAN,scope,imgType);
+[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,greenChannel,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
@@ -213,7 +208,7 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
         end
         
         for i = 1:length(frameBlock)
-            fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' imgType]); % Format of the Bruker tif filenames 
+            fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' inputParams.FORMAT]); % Format of the Bruker tif filenames 
             RedIMG(:,:,i)  = imread(fName);
 %             fh1 = fopen(files(start_Frame-1+i).name); % read raw image
 %             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
@@ -314,7 +309,7 @@ delete(gcp('nocreate'));
 neuropilSubPercent = 70; % use this default value for now
 percent = 50; % percentile considered to calculate the baseline fluorescence intensity
 if inputParams.ROI == 1 % no filled ROIs
-%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,exptId,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,percent); 
+%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,percent); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder_mex(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),percent,neuropilSubPercent);   
 else
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars.frameRate,cell_centroids(:,2),cell_centroids(:,1),r_pixels,floor(dffwindow/2),percent); 
@@ -362,7 +357,7 @@ smoothwin = 9; %3             % window size used to smooth fluorescence intensit
 batch_size = batchSettingsParams.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
 gap = batchSettingsParams.GAP; % Frequency of updating the figures (e.g. every 15 frames)
 
-realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,exptId,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, inputParams.NUMCHAN, scope,imgType,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
+realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,inputParams.EXID,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, inputParams.NUMCHAN, inputParams.SCOPE,inputParams.FORMAT,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
 rmpath(genpath('utilities'));
 rmpath(genpath('Psignal')); % path to Psignal folder
 

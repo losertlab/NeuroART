@@ -62,7 +62,7 @@ function [inputParams, canceled] = inputDialogRT(dataPath)
     Prompt(end+1,:) = {'Image format','FORMAT',[]};
     Formats(6,1).type = 'list';
     Formats(6,1).style = 'popupmenu';
-    Formats(6,1).items = {'raw','TIF'};
+    Formats(6,1).items = {'.raw','.tif'};
     % DefAns.FORMAT = 'raw';
     
     Prompt(end+1,:) = {'Imaging system','SCOPE',[]};
@@ -141,6 +141,8 @@ function [inputParams, canceled] = inputDialogRT(dataPath)
     
     [inputParams,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
     
+    inputParams.FORMAT = Formats(6,1).items{inputParams.FORMAT};
+
     clear d DefAns files Formats Options Prompt Title
     
     % Prompt(end+1,:) = {'Action','Action',[]};
