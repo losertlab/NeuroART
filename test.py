@@ -1,10 +1,16 @@
+import pyximport
+pyximport.install()
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import argparse
 from matplotlib.patches import Rectangle as rect
 from PIL import Image
-from cite_on import Detector
+from citeon import *
+from citeon.cite_on import *
+from citeon.cite_on.utils import *
 from time import time
 from scipy.cluster.hierarchy import dendrogram, linkage, leaves_list
 

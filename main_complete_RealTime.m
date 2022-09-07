@@ -1,7 +1,7 @@
 close all
 % clear
 
-addpath(genpath('utilities'));
+addpath(genpath('tools'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
 
@@ -274,9 +274,11 @@ elseif Answer.CFIND == 4 % From File
     end
 elseif Answer.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
-    [~,~] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(frameBlock)) ' -p ' ImageFile]);
+    [a,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(frameBlock)) ' -p ' ImageFile]);
+    disp(a);
+    disp(b);
     T = readtable('cell_coordinates.csv');
-    clear cell_centroids;
+    
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
 else
