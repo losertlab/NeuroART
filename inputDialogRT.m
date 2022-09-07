@@ -51,13 +51,13 @@ Formats(4,1).size = 250; %[-1 0];
 % parts = strsplit(pwd, filesep);
 parts = strsplit(dataPath, filesep);
 parent_folder = strjoin(parts(1:end-1), filesep);
-DefAns.IMGFOLDER = parent_folder;
+DefAns.IMGFOLDER = 'C:\Users\Losert Lab\Documents\Data';
 
 Prompt(end+1,:) = {'Image file name','IMG',[]};
 Formats(5,1).type = 'edit';
 Formats(5,1).format = 'text';
 Formats(5,1).size = 200;
-DefAns.IMG = 'Image_0001_0001';
+DefAns.IMG = 'greenchannel_6000';
 
 Prompt(end+1,:) = {'Image format','FORMAT',[]};
 Formats(6,1).type = 'list';
@@ -83,7 +83,7 @@ Formats(9,1).style = 'popupmenu';
 % Formats(9,1).format = 'text';
 Formats(9,1).items = {'Yes','No'};
 % Formats(9,1).span = [2 1];  % item is 3 fields x 1 field
-% DefAns.RF = 1;  
+DefAns.RF = 2;  
 
 Prompt(end+1,:) = {'Red Channel Available?','RCHAN',[]};
 Formats(10,1).type = 'list';
