@@ -51,13 +51,13 @@ Formats(4,1).size = 250; %[-1 0];
 % parts = strsplit(pwd, filesep);
 parts = strsplit(dataPath, filesep);
 parent_folder = strjoin(parts(1:end-1), filesep);
-DefAns.IMGFOLDER = 'C:\Users\Losert Lab\Documents\Data';
+DefAns.IMGFOLDER = parent_folder;
 
 Prompt(end+1,:) = {'Image file name','IMG',[]};
 Formats(5,1).type = 'edit';
 Formats(5,1).format = 'text';
 Formats(5,1).size = 200;
-DefAns.IMG = 'greenchannel_6000';
+DefAns.IMG = 'Image_0001_0001';
 
 Prompt(end+1,:) = {'Image format','FORMAT',[]};
 Formats(6,1).type = 'list';
@@ -101,35 +101,44 @@ Formats(11,1).items = {'Manual','CaImAn','Cite-on','From File'};
 % Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
 DefAns.CFIND = 3; 
 
-Prompt(end+1,:) = {'ROI Type','ROI',[]};
+
+Prompt(end+1,:) = {'Spatial Light Modulator','SLM',[]};
 Formats(12,1).type = 'list';
 Formats(12,1).style = 'popupmenu';
+% Formats(11,1).format = 'text';
+Formats(12,1).items = {'None','BNS','Other'};
+% Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
+DefAns.SLM = 1; 
+
+Prompt(end+1,:) = {'ROI Type','ROI',[]};
+Formats(13,1).type = 'list';
+Formats(13,1).style = 'popupmenu';
 % Formats(12,1).format = 'text';
-Formats(12,1).items = {'Not Filled','Filled'};
+Formats(13,1).items = {'Not Filled','Filled'};
 % Formats(12,1).span = [2 1];  % item is 3 fields x 1 field
 % DefAns.ROI = 2; 
 
 Prompt(end+1,:) = {'Network Analysis Method','NET',[]};
-Formats(13,1).type = 'list';
-Formats(13,1).style = 'popupmenu';
+Formats(14,1).type = 'list';
+Formats(14,1).style = 'popupmenu';
 % Formats(13,1).format = 'text';
-Formats(13,1).items = {'MST','Correlations'};
+Formats(14,1).items = {'MST','Correlations'};
 % Formats(13,1).span = [2 1];  % item is 3 fields x 1 field
 % DefAns.NET = 1; 
 
 Prompt(end+1,:) = {'Correlation Analysis Window','CWIN',[]};
-Formats(14,1).type = 'list';
-Formats(14,1).style = 'popupmenu';
+Formats(15,1).type = 'list';
+Formats(15,1).style = 'popupmenu';
 % Formats(14,1).format = 'text';
-Formats(14,1).items = {'Cumulative','Fixed'};
+Formats(15,1).items = {'Cumulative','Fixed'};
 % Formats(14,1).span = [2 1];  % item is 3 fields x 1 field
 % DefAns.CWIN = 1; 
 
 Prompt(end+1,:) = {'Correlation Window size (if fixed)', 'CWINF','seconds'};
-Formats(15,1).type = 'edit';
-Formats(15,1).format = 'integer';
-Formats(15,1).labelloc = 'leftmiddle';
-Formats(15,1).size = 50; 
+Formats(16,1).type = 'edit';
+Formats(16,1).format = 'integer';
+Formats(16,1).labelloc = 'leftmiddle';
+Formats(16,1).size = 50; 
 DefAns.CWINF = 5;
 
 % Prompt(end+1,:) = {'Imaging Frequency','FQ','Hz'};

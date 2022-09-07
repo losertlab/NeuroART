@@ -5,74 +5,10 @@ addpath(genpath('utilities'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
 
-%% SLM Initialization (for photostimulation when the SLM is available)
-
-% % Boulder Nonlinear Systems
-% % Required firmware: Apr 16 2018 or later
-% 
-% regional_lut_file = 'SLM_LF033_1064nm_2019-09-06_000_LUT.txt'; %Used for Overdrive operation
-% 
-% %--- SDK parameters (these usually don't change) ---
-% true_frames = 1;
-% board_number = 1;       % Can be used to select individual SLM systems if more than one is connected
-%                         % Default: 1 = 1st (or only) driver board found
-% 
-% SLM_ON = 0; % DZ 04/22 to check the status of SLM
-% 
-% %--- Dummy parameters ---
-% % (needed so Configure_overdrive is compatible with devices that don't do on-board overdrive; these values don't affect LFSD)
-% use_GPU        = 1;     %1 = Use GPU for calculating OD frames, if available (not used for LFSD since OD frames are calculated on board)
-% max_OD_frames = 20;     %Max number of OD frames to reserve in memory (not used for LFSD since OD frames are calculated on board)
-% 
-% % --- Load DLL ---
-% %   Overdrive_SDK_C_wrapper.dll, Overdrive_SDK_C_wrapper.h,
-% %   Overdrive_SDK.dll, CL_ophane.dll, FreeImage.dll, and wdapi1021.dll
-% %   should all be located in a path accessible by this Matlab program
-% 
-% dll_name = 'Overdrive_SDK_C_wrapper';
-% dll_header = 'Overdrive_SDK_C_wrapper.h';
-% loadlibrary(dll_name, dll_header);
-% 
-% % --- Create the SDK instance ---
-% calllib(dll_name, 'Create_SDK');
-% overdrive_available = calllib(dll_name, 'Configure_overdrive', use_GPU, regional_lut_file, max_OD_frames); %1 = error
-% num_boards = calllib(dll_name, 'Num_devices');
-% 
-% if num_boards == 0
-%     disp(strcat(dll_name, ' was not successfully constructed'));
-%     disp(calllib(dll_name, 'Get_last_error_message'));
-% else
-%     disp(strcat(dll_name, ' was successfully constructed'));
-%     fprintf('Found %u SLM controller(s)\n', num_boards);
-%     
-%     % Calculate OD frames and write them to the SLM
-%     
-%     % Set the basic SLM parameters
-%     true_frame_error = calllib(dll_name, 'Set_true_frames', true_frames);
-%     if true_frame_error
-%         disp('Error setting true frames');
-%     end
-% 
-%     % Turn SLM power on
-%     % In OverDrive C wrapper, input is only power state, not board number.
-%     SLM_power_on_error = calllib(dll_name, 'SLM_power', 1); 
-%     if SLM_power_on_error
-%         disp('Error turning SLM power on');
-%     end
-%     
-%     % --- Check for Overdrive compatibility (i.e. configure_overdrive worked) ---
-%     if (overdrive_available == 1)
-%         disp('Error configuring overdrive. Check LUT file.')
-%     else
-%         disp('Individual image mode (non-triggered)')
-%         SLM_ON = 1;
-%     end
-%        
-% end 
+%%% Create struct to parse input variables to RT app 09/01/2022
 
 %% Input parameters for NeuroART
 
-% dataPath = 'E:\NeuroART\';
 dataPath = [pwd, filesep];  % set datapath to current folder
 
 inputDialogRT; % get input parameters from the user
@@ -100,7 +36,77 @@ ImageFile = [Answer.IMGFOLDER, filesep, Answer.IMG, imgType]; % The file that co
 numChannels = Answer.NUMCHAN; % Number of channels
 scope = Answer.SCOPE; % 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
 
-def_initialBatchSize = 600; % default values for the input dialog
+dll_name = '';
+board_number = 1;  
+SLM_ON = 0; % DZ 04/22 to check the status of SLM (Default: OFF)
+
+%% SLM Initialization (for photostimulation when the SLM is available)
+
+% Boulder Nonlinear Systems
+% Required firmware: Apr 16 2018 or later
+
+if Answer.SLM == 2 %Boulder Nonlinear Systems
+    regional_lut_file = 'SLM_LF033_1064nm_2019-09-06_000_LUT.txt'; %Used for Overdrive operation
+
+    %--- SDK parameters (these usually don't change) ---
+    true_frames = 1;
+    board_number = 1;       % Can be used to select individual SLM systems if more than one is connected
+                            % Default: 1 = 1st (or only) driver board found
+
+    %--- Dummy parameters ---
+    % (needed so Configure_overdrive is compatible with devices that don't do on-board overdrive; these values don't affect LFSD)
+    use_GPU        = 1;     %1 = Use GPU for calculating OD frames, if available (not used for LFSD since OD frames are calculated on board)
+    max_OD_frames = 20;     %Max number of OD frames to reserve in memory (not used for LFSD since OD frames are calculated on board)
+
+    % --- Load DLL ---
+    %   Overdrive_SDK_C_wrapper.dll, Overdrive_SDK_C_wrapper.h,
+    %   Overdrive_SDK.dll, CL_ophane.dll, FreeImage.dll, and wdapi1021.dll
+    %   should all be located in a path accessible by this Matlab program
+
+    dll_name = 'Overdrive_SDK_C_wrapper';
+    dll_header = 'Overdrive_SDK_C_wrapper.h';
+    loadlibrary(dll_name, dll_header);
+
+    % --- Create the SDK instance ---
+    calllib(dll_name, 'Create_SDK');
+    overdrive_available = calllib(dll_name, 'Configure_overdrive', use_GPU, regional_lut_file, max_OD_frames); %1 = error
+    num_boards = calllib(dll_name, 'Num_devices');
+
+    if num_boards == 0
+        disp(strcat(dll_name, ' was not successfully constructed'));
+        disp(calllib(dll_name, 'Get_last_error_message'));
+    else
+        disp(strcat(dll_name, ' was successfully constructed'));
+        fprintf('Found %u SLM controller(s)\n', num_boards);
+
+        % Calculate OD frames and write them to the SLM
+
+        % Set the basic SLM parameters
+        true_frame_error = calllib(dll_name, 'Set_true_frames', true_frames);
+        if true_frame_error
+            disp('Error setting true frames');
+        end
+
+        % Turn SLM power on
+        % In OverDrive C wrapper, input is only power state, not board number.
+        SLM_power_on_error = calllib(dll_name, 'SLM_power', 1); 
+        if SLM_power_on_error
+            disp('Error turning SLM power on');
+        end
+
+        % --- Check for Overdrive compatibility (i.e. configure_overdrive worked) ---
+        if (overdrive_available == 1)
+            disp('Error configuring overdrive. Check LUT file.')
+        else
+            disp('Individual image mode (non-triggered)')
+            SLM_ON = 1;
+        end
+    end
+end
+
+%% Initial Batch Settings
+
+def_initialBatchSize = 601; % default values for the input dialog
 def_BatchSize = 1000;
 
 inputDialog1; % initial batch settings
@@ -138,43 +144,12 @@ if Answer.RF == 1 % Analyzing receptive fields
      end
 end
 
-%% Read the frames in real time
-
-% if (scope==2 || scope==3) % Bruker system
-%     job = batch(@BrukerReadWriteRaw,0,{ImageFile,numChannels,exptId,scope});
-%     %modified by GDS on 6/9/2021
-%     pause(10.0);
-%     %end modification
-% else
-%     job = batch(@realTimeReadXML,0,{ImageFile,workingDir,exptId});
-% end
-
 %% Reading experimental parameters and motion correction of the initial batch
 
 XML = danParseXML('Experiment.xml');
 exptVars = xmlVersionCheck(XML);
+exptVars.frameRate = 10; % for images acquired from micromanager
 
-% exptData = strcat('exptVars_',exptId,'.mat');
-
-% j = 0;
-% while j < 3000 % Time out after 30 seconds
-% 
-%     if isfile(exptData)
-%         load(exptData,'exptVars');
-%         break;
-%     end
-%     j = j + 1;
-%     pause(0.01)
-% 
-% end
-% 
-% if j == 3000
-%     promptMessage = sprintf('Could not find the XML file with the experimental parameters');
-%     msgbox(promptMessage,'Error','error');
-%     return
-% end
-
-% load('exptVars_RT_test1.mat'); % only for testing
 
 imagingFreq = exptVars.frameRate;
 dffwindow = floor(imagingFreq * winSizeSeconds); % 600 or [i-300, i+300]
@@ -202,7 +177,7 @@ if wait == 10000
 end
 
 I = (mean(IMG(:,:,1:length(frameBlock)),3)); % Mean image
-%I = (stdev(IMG(:,:,1:length(frameBlock)),3)); % Mean image
+%I = (stdev(IMG(:,:,1:length(frameBlock)),3)); % Standard deviation image
 fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
 imTemplate = fft2(fixed);
 
@@ -224,71 +199,48 @@ if Answer.RCHAN == 1 % if the red channel is not available
 %         tx(j) = tx; %error(4);
     end
 else % Only valid for individual tif files spitted out by Bruker (2 channel data)
-%     inputDialog2; % specify the red channel folder
-%     if Cancelled2
-%         for j = 1:length(frameBlock)
-%             % using Fourier transformation of images for registration
-%             error = dftregistration(imTemplate,fft2(IMG(:,:,j)),dftResolution);
-%             ty(j) = error(3);
-%             tx(j) = error(4);
-%         end
-%     else
-%         redPath = Answer2.INTBATCH;
-%         RedImgseq = Answer2.IMGSEQ;
-%         cd(redPath)
-%         
-%         files = dir([RedImgseq '*.raw']);
-        RedIMG = nan(exptVars.dimX,exptVars.dimY,length(frameBlock)); %% change to length(fileInd:length(files))
-        redID = 2;
-        if Answer1.GREENCHAN == 2
-            redID = 1;
-        end
         
-        for i = 1:length(frameBlock)
-            fName = fullfile(Answer.IMGFOLDER, [Answer.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' imgType]); % Format of the Bruker tif filenames 
-            RedIMG(:,:,i)  = imread(fName);
+    RedIMG = nan(exptVars.dimX,exptVars.dimY,length(frameBlock)); %% change to length(fileInd:length(files))   
+    redID = 2;
+        
+    if Answer1.GREENCHAN == 2
+        redID = 1; 
+    end
+
+    for i = 1:length(frameBlock)
+        fName = fullfile(Answer.IMGFOLDER, [Answer.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' imgType]); % Format of the Bruker tif filenames 
+        RedIMG(:,:,i)  = imread(fName);
 %             fh1 = fopen(files(start_Frame-1+i).name); % read raw image
 %             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
 %             RedIMG(:,:,i)  = RedImg';
 %             fclose(fh1);
-        end
-   
-        clear files
+        
+    end
 
-        cd(workingDir)
+    clear files
 
-        I = (mean(RedIMG(:,:,1:length(frameBlock)),3)); % Mean image
-        fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
-        imTemplate_red = fft2(fixed);
+    cd(workingDir)
     
-        for j = 1:length(frameBlock)
-            % using Fourier transformation of images for registration
-            error = dftregistration(imTemplate_red,fft2(RedIMG(:,:,j)),dftResolution);
-            ty(j) = error(3);
-            tx(j) = error(4);
-        end
+    I = (mean(RedIMG(:,:,1:length(frameBlock)),3)); % Mean image
+    fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
+    imTemplate_red = fft2(fixed);
         
-        meanIMG = mean(RedIMG,3); % Mean image for cell center clicking
-        norm_meanRedIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
+    for j = 1:length(frameBlock)
+        % using Fourier transformation of images for registration
+        error = dftregistration(imTemplate_red,fft2(RedIMG(:,:,j)),dftResolution);
+        ty(j) = error(3);
+        tx(j) = error(4);
+    end
         
-        clear RedIMG RedImg imTemplate_red
+    meanIMG = mean(RedIMG,3); % Mean image for cell center clicking
+    norm_meanRedIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
+        
+    clear RedIMG RedImg imTemplate_red
 end
 
 % offsets = [ty' tx'];
    
 
-%% Apply offsets
-    
-% pdTmp = round(max(exptVars.dimY,exptVars.dimX)/3); % 1/3 of IMG size for padding
-% pd = pdTmp + mod(pdTmp,2); % Make padding amount an even number
-% % RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(frameBlock), 'uint16'); % don't need to index RegIMG if saving and stopping
-% for t = 1:length(frameBlock)
-%     tmpRegIMG = zeros(exptVars.dimY+pd,exptVars.dimX+pd,'uint16');
-%     tmpRegIMG( pd/2+ty(t):pd/2+ty(t)+exptVars.dimY-1 , pd/2+tx(t):pd/2+tx(t)+exptVars.dimX-1) = IMG(:,:,t);
-%     RegIMG(:,:,t) =  tmpRegIMG(pd/2:pd/2+exptVars.dimY-1 , pd/2:pd/2+exptVars.dimX-1);
-% end
-
-% clear IMG I tmpRegIMG fixed tx ty 
 clear IMG I fixed 
     
 tstop = toc(ist);
@@ -346,9 +298,9 @@ delete(gcp('nocreate'));
 neuropilSubPercent = 70; % use this default value for now
 if Answer.ROI == 1 % no filled ROIs
 %     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,exptId,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,percent); 
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder_mex(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),percent,neuropilSubPercent);   
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),percent,neuropilSubPercent);   
 else
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars.frameRate,cell_centroids(:,2),cell_centroids(:,1),r_pixels,floor(dffwindow/2),percent); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),r_pixels,floor(dffwindow/2),percent); 
 end
 
 clear RegIMG
@@ -387,6 +339,54 @@ if (mstWin > numFrames)
 end
 
 r_display = floor(r_pixels*0.4); % display smaller size patches
-realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,exptId,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, numChannels, scope,imgType,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
+
+
+%% Create struct of input parameters for real time analysis
+
+RTparams = struct;
+RTparams.imTemplate = imTemplate;
+RTparams.DFF = DFF;
+RTparams.npBWout = npBWout;
+RTparams.rawFluo = fluoAllSmooth';
+RTparams.roiBW2 = roiBW2;
+RTparams.xcRaw = xcRaw;
+RTparams.ycRaw = ycRaw;
+RTparams.norm_meanIMG = norm_meanIMG;
+RTparams.symmFLAG = symmFLAG;
+RTparams.smoothwin = smoothwin;
+RTparams.r = r_display;
+RTparams.dffwindow = dffwindow;
+RTparams.percent = percent;
+RTparams.last_init_frame = last_init_Frame;
+RTparams.displayWin = displayWin;
+RTparams.batch_size = batch_size;
+RTparams.gap = gap;
+RTparams.exptId = exptId;
+RTparams.exptVars = exptVars;
+RTparams.minNpSubFluo = minNpSubFluo;
+RTparams.maxAdjF = maxAdjF;
+RTparams.numInitFrames = numInitFrames;
+RTparams.mst = mst;
+RTparams.mstWin = mstWin;
+RTparams.numAvailFrames = numFrames;
+RTparams.imagingFreq = imagingFreq;
+RTparams.thorSyncFile = thorSyncFile;
+RTparams.psignalFile = psignalFile;
+RTparams.rawFileHandle = fh;
+RTparams.greenChannel = greenChannel;
+RTparams.numChannels = numChannels;
+RTparams.scope = scope;
+RTparams.imgType = imgType;
+RTparams.ImageFile = ImageFile;
+RTparams.JiSignalInfo = JiSignalInfo;
+RTparams.norm_meanRedIMG = norm_meanRedIMG;
+RTparams.tstack = tstack;
+RTparams.dll_name = dll_name;
+RTparams.board_number = board_number;
+RTparams.SLM_ON = SLM_ON;
+
+%% Real time analysis
+
+realTimeApp(RTparams);
 rmpath(genpath('utilities'));
 rmpath(genpath('Psignal')); % path to Psignal folder
