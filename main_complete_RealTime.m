@@ -102,8 +102,7 @@ ImageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, inputParams.FORMAT
 
 %% Reading experimental parameters and motion correction of the initial batch
 
-XML = danParseXML('Experiment.xml');
-exptVars = xmlVersionCheck(XML);
+exptVars = xmlVersionCheck(danParseXML('Experiment.xml'));
 
 % exptData = strcat('exptVars_',inputParams.EXID,'.mat');
 
@@ -127,21 +126,16 @@ exptVars = xmlVersionCheck(XML);
 
 % load('exptVars_RT_test1.mat'); % only for testing
 
-start_Frame = batchSettingsParams.START; % starting frame of the initial batch
-last_init_Frame = batchSettingsParams.END; % ending frame of the initial batch
-numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
+batchSettingsParams.initFrames = batchSettingsParams.END - batchSettingsParams.START + 1; % Number of frames in the initial batch (used to detect ROIs)
 
-greenChannel = batchSettingsParams.GREENCHAN; % Make this automatically detected
 %moved from below by AVS
-frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
+frameBlock = batchSettingsParams.START:batchSettingsParams.END; % earlier was, fileInd:length(files)
 
-imagingFreq = exptVars.frameRate;
 winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
-dffwindow = floor(imagingFreq * winSizeSeconds); % 600 or [i-300, i+300]
-r = inputParams.R; % average radius of ROIs (in microns)
-r_pixels = round(r/exptVars.micronsPerPixel);
+dffwindow = floor(exptVars.frameRate * winSizeSeconds); % 600 or [i-300, i+300]
+r_pixels = round(inputParams.R/exptVars.micronsPerPixel);
 
-if (dffwindow > numInitFrames)
+if (dffwindow > batchSettingsParams.initFrames)
     promptMessage = sprintf('Initial batch should have at least %d frames',dffwindow + 1);
     msgbox(promptMessage,'Error','error');  
     return;
@@ -150,11 +144,11 @@ end
 ist = tic;
 fprintf('Image registration started ... \n');
 
-frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
+frameBlock = batchSettingsParams.START:batchSettingsParams.END; % earlier was, fileInd:length(files)
 
 %% Read the frames in iteratively
 
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,greenChannel,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
+[IMG, wait, frameid, fh,tstack] = readInitialBatch(ImageFile,frameBlock,exptVars,batchSettingsParams.GREENCHAN,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT, inputParams, batchSettingsParams);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
@@ -210,7 +204,7 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
         for i = 1:length(frameBlock)
             fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' inputParams.FORMAT]); % Format of the Bruker tif filenames 
             RedIMG(:,:,i)  = imread(fName);
-%             fh1 = fopen(files(start_Frame-1+i).name); % read raw image
+%             fh1 = fopen(files(batchSettingsParams.START-1+i).name); % read raw image
 %             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
 %             RedIMG(:,:,i)  = RedImg';
 %             fclose(fh1);
@@ -330,7 +324,7 @@ end
 
 if inputParams.CWIN == 2 % Using a shorter (fixed) window size
     shortWindow = 1;
-    mstWin = floor((inputParams.CWINF)*imagingFreq); % max. allowed size = currently available number of frames
+    mstWin = floor((inputParams.CWINF)*exptVars.frameRate); % max. allowed size = currently available number of frames
 end
     
 clear inputParams canceled batchSettingsParams Cancelled1
@@ -357,7 +351,7 @@ smoothwin = 9; %3             % window size used to smooth fluorescence intensit
 batch_size = batchSettingsParams.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
 gap = batchSettingsParams.GAP; % Frequency of updating the figures (e.g. every 15 frames)
 
-realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,last_init_Frame,displayWin,batch_size,gap,inputParams.EXID,exptVars,minNpSubFluo,maxAdjF,numInitFrames,mst,mstWin,numFrames,imagingFreq,thorSyncFile,psignalFile,fh, greenChannel, inputParams.NUMCHAN, inputParams.SCOPE,inputParams.FORMAT,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
+realTimeApp(imTemplate,DFF,npBWout,fluoAllSmooth',roiBW2,xcRaw,ycRaw,norm_meanIMG,symmFLAG,smoothwin,r_display,dffwindow,percent,batchSettingsParams.END,displayWin,batch_size,gap,inputParams.EXID,exptVars,minNpSubFluo,maxAdjF,batchSettingsParams.initFrames,mst,mstWin,numFrames,exptVars.frameRate,thorSyncFile,psignalFile,fh, batchSettingsParams.GREENCHAN, inputParams.NUMCHAN, inputParams.SCOPE,inputParams.FORMAT,ImageFile, JiSignalInfo, norm_meanRedIMG,tstack,dll_name,board_number,SLM_ON);
 rmpath(genpath('utilities'));
 rmpath(genpath('Psignal')); % path to Psignal folder
 
