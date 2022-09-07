@@ -1,7 +1,3 @@
-import pyximport
-pyximport.install()
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
