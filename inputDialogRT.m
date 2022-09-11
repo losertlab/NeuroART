@@ -1,8 +1,12 @@
+function inputParams = inputDialogRT()
 %INPUTSDLG DEMO (Enhanced input dialog box with multiple data types)
 % Written by: Takeshi Ikuma
 % Last Updated: May 5 2010
 %
 % Updated for additional functions F. Hatz 2013
+
+dataPath = [pwd, filesep];  % set datapath to current folder
+formats = {'.raw','.tif'};
 
 Title = 'Input Parameters';
 %%%% SETTING DIALOG OPTIONS
@@ -62,7 +66,7 @@ DefAns.IMG = 'Image_0001_0001';
 Prompt(end+1,:) = {'Image format','FORMAT',[]};
 Formats(6,1).type = 'list';
 Formats(6,1).style = 'popupmenu';
-Formats(6,1).items = {'raw','TIF'};
+Formats(6,1).items = formats;
 % DefAns.FORMAT = 'raw';
 
 Prompt(end+1,:) = {'Imaging system','SCOPE',[]};
@@ -148,7 +152,19 @@ DefAns.CWINF = 5;
 % Formats(7,1).size = 100;
 % DefAns.FQ = 30;
 
-[Answer,Cancelled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
+[inputParams,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
+inputParams.canceled = canceled;
+inputParams.FORMAT = formats{inputParams.FORMAT};
+
+inputParams.symmFlag = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5
+inputParams.smoothWin = 9; %3             % window size used to smooth fluorescence intensity (F) traces
+inputParams.winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
+inputParams.fluorPercentile = 50; % percentile considered to calculate the baseline fluorescence intensity
+inputParams.dftResolution = 1;
+inputParams.imageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, inputParams.FORMAT]; % The file that contains all the images
+inputParams.dllName = '';
+inputParams.boardNumber = 1;
+inputParams.slmOn = false; % DZ 04/22 to check the status of SLM (Default: OFF)
 
 clear d DefAns files Formats Options Prompt Title
 
@@ -248,3 +264,4 @@ clear d DefAns files Formats Options Prompt Title
 % DefAns.X = pi;
 % DefAns.Y = 4;
 % DefAns.XY = DefAns.X*DefAns.Y;
+end
