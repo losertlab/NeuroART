@@ -29,25 +29,15 @@ rfParams = rfDialog(inputParams);
 
 %% Reading experimental parameters and motion correction of the initial batch
 
-XML = danParseXML('Experiment.xml');
-exptVars = xmlVersionCheck(XML);
-exptVars.frameRate = 10; % for images acquired from micromanager
-
-
-imagingFreq = exptVars.frameRate;
-dffwindow = floor(imagingFreq * inputParams.winSizeSeconds); % 600 or [i-300, i+300]
-r_pixels = round(inputParams.R/exptVars.micronsPerPixel);
-
-if (dffwindow > batchSettings.numInitFrames)
-    promptMessage = sprintf('Initial batch should have at least %d frames',dffwindow + 1);
-    msgbox(promptMessage,'Error','error');  
+exptVars = exptVarsInit(inputParams, batchSettings);
+if (exptVars.error)
     return;
 end
 
+%% Read the frames in iteratively
+
 ist = tic;
 fprintf('Image registration started ... \n');
-
-%% Read the frames in iteratively
 
 [IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams.imageFile,batchSettings.frameBlock,exptVars,batchSettings.GREENCHAN,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
 
@@ -181,10 +171,10 @@ delete(gcp('nocreate'));
 
 neuropilSubPercent = 70; % use this default value for now
 if inputParams.ROI == 1 % no filled ROIs
-%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,r_pixels,dffwindow/2,inputParams.fluorPercentile); 
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,r_pixels,floor(dffwindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
+%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
 else
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),r_pixels,floor(dffwindow/2),inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
 end
 
 clear RegIMG
@@ -202,7 +192,7 @@ end
 
 if inputParams.CWIN == 2 % Using a shorter (fixed) window size
     shortWindow = 1;
-    mstWin = floor((inputParams.CWINF)*imagingFreq); % max. allowed size = currently available number of frames
+    mstWin = floor((inputParams.CWINF)*exptVars.frameRate); % max. allowed size = currently available number of frames
 end
     
 clear inputParams Cancelled batchSettings Cancelled1
@@ -222,7 +212,7 @@ if (mstWin > numFrames)
 	return;
 end
 
-r_display = floor(r_pixels*0.4); % display smaller size patches
+r_display = floor(exptVars.rPixels*0.4); % display smaller size patches
 
 
 %% Create struct of input parameters for real time analysis
@@ -239,7 +229,7 @@ RTparams.norm_meanIMG = norm_meanIMG;
 RTparams.symmFLAG = inputParams.symmFlag;
 RTparams.smoothwin = inputParams.smoothWin;
 RTparams.r = r_display;
-RTparams.dffwindow = dffwindow;
+RTparams.dffwindow = exptVars.dffWindow;
 RTparams.percent = inputParams.fluorPercentile;
 RTparams.last_init_frame = batchSettings.END;
 RTparams.displayWin = inputParams.DISPLAY;
@@ -253,7 +243,7 @@ RTparams.numInitFrames = batchSettings.numInitFrames;
 RTparams.mst = mst;
 RTparams.mstWin = mstWin;
 RTparams.numAvailFrames = numFrames;
-RTparams.imagingFreq = imagingFreq;
+RTparams.imagingFreq = exptVars.frameRate;
 RTparams.thorSyncFile = rfParams.thorSyncFile;
 RTparams.psignalFile = rfParams.psignalFile;
 RTparams.rawFileHandle = fh;
