@@ -80,17 +80,17 @@ end
 
 %% Initial Batch Settings
 
-inputDialog1; % initial batch settings
-if Cancelled1
+batchSettings = batchSettingsDialog(inputParams); % initial batch settings
+if batchSettings.canceled
     return;
 end
 
-start_Frame = Answer1.START; % starting frame of the initial batch
-last_init_Frame = Answer1.END; % ending frame of the initial batch
+start_Frame = batchSettings.START; % starting frame of the initial batch
+last_init_Frame = batchSettings.END; % ending frame of the initial batch
 numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
-batch_size = Answer1.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
-gap = Answer1.GAP; % Frequency of updating the figures (e.g. every 15 frames)
-greenChannel = Answer1.GREENCHAN; % Make this automatically detected
+batch_size = batchSettings.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
+gap = batchSettings.GAP; % Frequency of updating the figures (e.g. every 15 frames)
+greenChannel = batchSettings.GREENCHAN; % Make this automatically detected
 numImagesToRead = numInitFrames + batch_size;
 %moved from below by AVS
 frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
@@ -174,7 +174,7 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
     RedIMG = nan(exptVars.dimX,exptVars.dimY,length(frameBlock)); %% change to length(fileInd:length(files))   
     redID = 2;
         
-    if Answer1.GREENCHAN == 2
+    if batchSettings.GREENCHAN == 2
         redID = 1; 
     end
 
@@ -294,7 +294,7 @@ if inputParams.CWIN == 2 % Using a shorter (fixed) window size
     mstWin = floor((inputParams.CWINF)*imagingFreq); % max. allowed size = currently available number of frames
 end
     
-clear inputParams Cancelled Answer1 Cancelled1
+clear inputParams Cancelled batchSettings Cancelled1
 
 %% Check whether enough number of frames are available
 
