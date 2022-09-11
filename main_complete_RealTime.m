@@ -85,16 +85,6 @@ if batchSettings.canceled
     return;
 end
 
-start_Frame = batchSettings.START; % starting frame of the initial batch
-last_init_Frame = batchSettings.END; % ending frame of the initial batch
-numInitFrames = last_init_Frame - start_Frame + 1; % Number of frames in the initial batch (used to detect ROIs)
-batch_size = batchSettings.BSIZE; % Maximum number of frames you expect to acquire after the initial batch of frames (set a tentative upper bound)
-gap = batchSettings.GAP; % Frequency of updating the figures (e.g. every 15 frames)
-greenChannel = batchSettings.GREENCHAN; % Make this automatically detected
-numImagesToRead = numInitFrames + batch_size;
-%moved from below by AVS
-frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
-
 thorSyncFile = '';
 psignalFile = '';
 JiSignalInfo = [];
@@ -126,7 +116,7 @@ imagingFreq = exptVars.frameRate;
 dffwindow = floor(imagingFreq * inputParams.winSizeSeconds); % 600 or [i-300, i+300]
 r_pixels = round(inputParams.R/exptVars.micronsPerPixel);
 
-if (dffwindow > numInitFrames)
+if (dffwindow > batchSettings.numInitFrames)
     promptMessage = sprintf('Initial batch should have at least %d frames',dffwindow + 1);
     msgbox(promptMessage,'Error','error');  
     return;
@@ -135,11 +125,9 @@ end
 ist = tic;
 fprintf('Image registration started ... \n');
 
-frameBlock = start_Frame:last_init_Frame; % earlier was, fileInd:length(files)
-
 %% Read the frames in iteratively
 
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams.imageFile,frameBlock,exptVars,greenChannel,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
+[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams.imageFile,batchSettings.frameBlock,exptVars,batchSettings.GREENCHAN,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
@@ -147,18 +135,18 @@ if wait == 10000
     return;
 end
 
-I = (mean(IMG(:,:,1:length(frameBlock)),3)); % Mean image
-%I = (stdev(IMG(:,:,1:length(frameBlock)),3)); % Standard deviation image
+I = (mean(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
+%I = (stdev(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Standard deviation image
 fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
 imTemplate = fft2(fixed);
 
 tstop = toc(ist);
 fprintf('Initial aquisition took %.4f seconds\n',tstop);
 
-RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(frameBlock), 'uint16');
+RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(batchSettings.frameBlock), 'uint16');
 
 if inputParams.RCHAN == 1 % if the red channel is not available
-    for j = 1:length(frameBlock)
+    for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
 %         error = dftregistration_coder_mex(imTemplate,fft2(IMG(:,:,j)),inputParams.dftResolution);
 
@@ -171,17 +159,17 @@ if inputParams.RCHAN == 1 % if the red channel is not available
     end
 else % Only valid for individual tif files spitted out by Bruker (2 channel data)
         
-    RedIMG = nan(exptVars.dimX,exptVars.dimY,length(frameBlock)); %% change to length(fileInd:length(files))   
+    RedIMG = nan(exptVars.dimX,exptVars.dimY,length(batchSettings.frameBlock)); %% change to length(fileInd:length(files))   
     redID = 2;
         
     if batchSettings.GREENCHAN == 2
         redID = 1; 
     end
 
-    for i = 1:length(frameBlock)
+    for i = 1:length(batchSettings.frameBlock)
         fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' inputParams.FORMAT]); % Format of the Bruker tif filenames 
         RedIMG(:,:,i)  = imread(fName);
-%             fh1 = fopen(files(start_Frame-1+i).name); % read raw image
+%             fh1 = fopen(files(batchSettings.START-1+i).name); % read raw image
 %             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
 %             RedIMG(:,:,i)  = RedImg';
 %             fclose(fh1);
@@ -192,11 +180,11 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
 
     cd(pwd)
     
-    I = (mean(RedIMG(:,:,1:length(frameBlock)),3)); % Mean image
+    I = (mean(RedIMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
     fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
     imTemplate_red = fft2(fixed);
         
-    for j = 1:length(frameBlock)
+    for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
         error = dftregistration(imTemplate_red,fft2(RedIMG(:,:,j)),inputParams.dftResolution);
         ty(j) = error(3);
@@ -245,7 +233,7 @@ elseif inputParams.CFIND == 4 % From File
     end
 elseif inputParams.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
-    [a,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(frameBlock)) ' -p ' inputParams.imageFile]);
+    [a,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile]);
     disp(a);
     disp(b);
     T = readtable('cell_coordinates.csv');
@@ -330,15 +318,15 @@ RTparams.smoothwin = inputParams.smoothWin;
 RTparams.r = r_display;
 RTparams.dffwindow = dffwindow;
 RTparams.percent = inputParams.fluorPercentile;
-RTparams.last_init_frame = last_init_Frame;
+RTparams.last_init_frame = batchSettings.END;
 RTparams.displayWin = inputParams.DISPLAY;
-RTparams.batch_size = batch_size;
-RTparams.gap = gap;
+RTparams.batch_size = batchSettings.BSIZE;
+RTparams.gap = batchSettings.GAP;
 RTparams.exptId = inputParams.EXID;
 RTparams.exptVars = exptVars;
 RTparams.minNpSubFluo = minNpSubFluo;
 RTparams.maxAdjF = maxAdjF;
-RTparams.numInitFrames = numInitFrames;
+RTparams.numInitFrames = batchSettings.numInitFrames;
 RTparams.mst = mst;
 RTparams.mstWin = mstWin;
 RTparams.numAvailFrames = numFrames;
@@ -346,7 +334,7 @@ RTparams.imagingFreq = imagingFreq;
 RTparams.thorSyncFile = thorSyncFile;
 RTparams.psignalFile = psignalFile;
 RTparams.rawFileHandle = fh;
-RTparams.greenChannel = greenChannel;
+RTparams.greenChannel = batchSettings.GREENCHAN;
 RTparams.numChannels = inputParams.NUMCHAN;
 RTparams.scope = inputParams.inputParams.SCOPE;
 RTparams.imgType = inputParams.FORMAT;

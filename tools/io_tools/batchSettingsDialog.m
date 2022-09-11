@@ -57,5 +57,8 @@ function batchSettings = batchSettingsDialog(inputParams)
     
     [batchSettings,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
     batchSettings.canceled = canceled;
+    batchSettings.numInitFrames = batchSettings.END - batchSettings.START + 1; % Number of frames in the initial batch (used to detect ROIs)
+    batchSettings.numImagesToRead = batchSettings.numInitFrames + batchSettings.BSIZE;
+    batchSettings.frameBlock = batchSettings.START:batchSettings.END; % earlier was, fileInd:length(files)
     clear d DefAns files Formats Options Prompt Title
 end
