@@ -85,25 +85,7 @@ if batchSettings.canceled
     return;
 end
 
-thorSyncFile = '';
-psignalFile = '';
-JiSignalInfo = [];
-norm_meanRedIMG = [];
-
-if inputParams.RF == 1 % Analyzing receptive fields
-     promptMessage = sprintf('Do you have Ji Signal Files?');
-     button = questdlg(promptMessage, 'Tuning Analysis', 'Yes', 'No', 'Yes');
-     if strcmpi(button, 'Yes')
-         [file,path] = uigetfile('*.mat','Please select the JiSignal file','stim_seq_210402_tones.mat');
-         JiSignalFile = [path,file];
-         JiSignalInfo = load(JiSignalFile).preset_stim_seq;
-     else
-         [file,path] = uigetfile('*.h5','Please select the thorSync file','Episode001.h5');
-         thorSyncFile = [path,file];
-         [file,path] = uigetfile('*.mat','Please select the pSignal file','RND_352r_2020_03_07_Phys_1.mat');
-         psignalFile = [path,file];
-     end
-end
+rfParams = rfDialog(inputParams);
 
 %% Reading experimental parameters and motion correction of the initial batch
 
@@ -145,6 +127,7 @@ fprintf('Initial aquisition took %.4f seconds\n',tstop);
 
 RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(batchSettings.frameBlock), 'uint16');
 
+norm_meanRedIMG = [];
 if inputParams.RCHAN == 1 % if the red channel is not available
     for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
@@ -331,15 +314,15 @@ RTparams.mst = mst;
 RTparams.mstWin = mstWin;
 RTparams.numAvailFrames = numFrames;
 RTparams.imagingFreq = imagingFreq;
-RTparams.thorSyncFile = thorSyncFile;
-RTparams.psignalFile = psignalFile;
+RTparams.thorSyncFile = rfParams.thorSyncFile;
+RTparams.psignalFile = rfParams.psignalFile;
 RTparams.rawFileHandle = fh;
 RTparams.greenChannel = batchSettings.GREENCHAN;
 RTparams.numChannels = inputParams.NUMCHAN;
 RTparams.scope = inputParams.inputParams.SCOPE;
 RTparams.imgType = inputParams.FORMAT;
 RTparams.ImageFile = inputParams.imageFile;
-RTparams.JiSignalInfo = JiSignalInfo;
+RTparams.JiSignalInfo = rfParams.JiSignalInfo;
 RTparams.norm_meanRedIMG = norm_meanRedIMG;
 RTparams.tstack = tstack;
 RTparams.dll_name = inputParams.dllName;
