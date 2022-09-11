@@ -80,9 +80,6 @@ end
 
 %% Initial Batch Settings
 
-def_initialBatchSize = 601; % default values for the input dialog
-def_BatchSize = 1000;
-
 inputDialog1; % initial batch settings
 if Cancelled1
     return;

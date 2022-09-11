@@ -4,6 +4,8 @@
 %
 % Updated for additional functions F. Hatz 2013
 
+def_initialBatchSize = 601; % default values for the input dialog
+def_BatchSize = 1000;
 Title = 'Initial Batch Settings';
 %%%% SETTING DIALOG OPTIONS
 % Options.WindowStyle = 'modal';
