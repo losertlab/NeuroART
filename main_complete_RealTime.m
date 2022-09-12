@@ -148,8 +148,8 @@ elseif inputParams.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
     ups = 2.0;
     th = 0.5;
-    [~,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile ' -u ' num2str(ups) ' -t ' num2str(th)]);
-    %disp(b);
+    [~,b] = system(['activate citeon & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p "' inputParams.imageFile '" -u ' num2str(ups) ' -t ' num2str(th)]);
+    disp(b);
     T = readtable('cell_coordinates.csv');
     
     cell_centroids(:,1) = T.Var2; %yc

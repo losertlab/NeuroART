@@ -1,0 +1,37 @@
+name: citeon_test
+channels:
+  - anaconda
+  - defaults
+  - conda-forge
+dependencies:
+  - holoviews
+  - bokeh
+  - ipykernel
+  - keras-applications
+  - keras-preprocessing
+  - matplotlib
+  - numpy
+  - opencv=3.4.2
+  - pillow
+  - pip
+  - python=3.7.7
+  - scikit-image<=0.16
+  - scikit-learn
+  - scipy
+  - tensorboard=1.13.1
+  - tensorflow=1.13.1
+  - tensorflow-base=1.13.1
+  - tensorflow-estimator
+  - tensorflow=1.13.1
+  - tqdm
+  - pip:
+    - setuptools==58.2.0
+    - imagecodecs==2020.2.18
+    - keras==2.3.1
+    - keras-resnet==0.1.0
+    - pyyaml==5.3.1
+    - tifffile==2020.5.11
+    - tiffile==2018.10.18
+    - PyQt5
+prefix: /opt/conda/envs/citeon_test
+
