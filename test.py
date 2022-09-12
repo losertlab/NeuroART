@@ -4,9 +4,7 @@ import csv
 import argparse
 from matplotlib.patches import Rectangle as rect
 from PIL import Image
-from citeon import *
-from citeon.cite_on import *
-from citeon.cite_on.utils import *
+from cite_on import Detector
 from time import time
 from scipy.cluster.hierarchy import dendrogram, linkage, leaves_list
 
@@ -47,11 +45,13 @@ def clustermap(a):
 
 ap = argparse.ArgumentParser()
 
-# Add the arguments to the parser
+#Add the arguments to the parser
 ap.add_argument("-x", "--numRows", type=int, required=True)
 ap.add_argument("-y", "--numCols", type=int, required=True)
 ap.add_argument("-n", "--numFrames", type=int, required=True)
 ap.add_argument("-p", "--fPath", required=True)
+ap.add_argument("-u", "--upscaling", type=float, required=True)
+ap.add_argument("-t", "--threshold", type=float, required=True)
 
 args = vars(ap.parse_args())
 
@@ -59,6 +59,8 @@ partial=time()
 rows = args['numRows']
 cols = args['numCols']
 n_frames = args['numFrames']
+ups = args['upscaling']
+th = args['threshold']
 
 fd = open(args['fPath'], 'rb')
 #im=Image.open(r"C:\Users\dular\Documents\LosertLab\Kelson_FRA\greenchannel_2000_tif.tif")
@@ -79,21 +81,39 @@ for i in range(n_frames):
 #print('Import took: '+str(time()-partial)+'s')
 partial=time()
 # median=fast_median(img)
-median=np.std(img,axis=2)
+median=np.median(img,axis=2)
+#std = np.std(img,axis=2)
+#std1 = np.reshape(std, [1,512*512])
+#median = (std - np.min(std1))/(np.percentile(std1,99.5)- np.min(std1))
+
+#for i in range(0,512):
+#    for j in range(0,512):
+#        if median[i][j]>1:
+#            median[i][j]=1
+
+
+
+#f,ax=plt.subplots(1,1,figsize=(15,15))
+#ax.imshow(median)
+#plt.show()
+
 #print('Median took: '+str(time()-partial)+'s')
 #plt.figure(figsize=(15,15))
 #plt.imshow(median)
 
-detector=Detector('wheighs/', gpu='0', init_shape=img.shape[:2], init_upscaling=0.8)
+#ups = 2.6 # to make init_upscaling = upscaling
+#th = 0.5
+
+detector=Detector('wheighs/', gpu='0', init_shape=img.shape[:2], init_upscaling=ups)
 partial=time()
-boxes=detector.detect(median,threshold=0.25,upscaling=0.8)
+boxes=detector.detect(median,threshold=th,upscaling=ups)
 #print('No of cells: ' + str(boxes.shape[0]));
 
 # name of csv file 
 filename = r"cell_coordinates.csv"
     
 # writing to csv file 
-with open(filename, 'w', newline='') as csvfile: 
+with open(filename, 'w', newline='') as csvfile:
     # creating a csv writer object 
     csvwriter = csv.writer(csvfile) 
         
@@ -104,8 +124,11 @@ with open(filename, 'w', newline='') as csvfile:
 print('Detection took: '+str(time()-partial)+'s')
 #draw_annotations(median,boxes, save='detections.svg')
 
+#im1 = Image.fromarray(median)
+#im1 = im1.save("bla.jpg")
+
 #img=np.ndarray((512,512,30),dtype=np.uint16)
 #detector=Detector('wheighs/', gpu='0', init_shape=img.shape[:2], init_upscaling=2);
-
-print(args);
+#print(np.min(std1),np.percentile(std1,95),np.max(std1))
+#print(args);
 print('Success');
