@@ -1,9 +1,4 @@
-cell_coordinates.csv
 *.csv
 *.mat
 
-cite_on/
-cite_on.org/
-Cite-on_installation/
-wheighs/
-weights/
+citeon/
