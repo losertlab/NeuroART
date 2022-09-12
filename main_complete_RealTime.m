@@ -195,7 +195,6 @@ if inputParams.CWIN == 2 % Using a shorter (fixed) window size
     mstWin = floor((inputParams.CWINF)*exptVars.frameRate); % max. allowed size = currently available number of frames
 end
     
-clear inputParams Cancelled batchSettings Cancelled1
 
 %% Check whether enough number of frames are available
 
@@ -249,7 +248,7 @@ RTparams.psignalFile = rfParams.psignalFile;
 RTparams.rawFileHandle = fh;
 RTparams.greenChannel = batchSettings.GREENCHAN;
 RTparams.numChannels = inputParams.NUMCHAN;
-RTparams.scope = inputParams.inputParams.SCOPE;
+RTparams.scope = inputParams.SCOPE;
 RTparams.imgType = inputParams.FORMAT;
 RTparams.ImageFile = inputParams.imageFile;
 RTparams.JiSignalInfo = rfParams.JiSignalInfo;
