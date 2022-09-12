@@ -4,7 +4,7 @@ import csv
 import argparse
 from matplotlib.patches import Rectangle as rect
 from PIL import Image
-from cite_on import Detector
+from citeon.cite_on import Detector
 from time import time
 from scipy.cluster.hierarchy import dendrogram, linkage, leaves_list
 
@@ -104,7 +104,7 @@ median=np.median(img,axis=2)
 #ups = 2.6 # to make init_upscaling = upscaling
 #th = 0.5
 
-detector=Detector('wheighs/', gpu='0', init_shape=img.shape[:2], init_upscaling=ups)
+detector=Detector('citeon/wheighs/', gpu='0', init_shape=img.shape[:2], init_upscaling=ups)
 partial=time()
 boxes=detector.detect(median,threshold=th,upscaling=ups)
 #print('No of cells: ' + str(boxes.shape[0]));
