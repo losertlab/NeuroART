@@ -31,7 +31,7 @@ Clone this repository.
 
 [CaImAn](https://caiman.readthedocs.io/en/master/index.html) should be already functional from the code.
 
-#### Installing Cite-on:
+#### Installing Cite-on for Windows:
 
 Open cmd in the NeuroART folder and run the following commands:
 - `git clone https://gitlab.iit.it/fellin-public/cite-on.git`
@@ -39,6 +39,18 @@ Open cmd in the NeuroART folder and run the following commands:
 - `conda env create -f citeonEnv.yml`
 - `conda activate citeon`
 - `conda install libpython m2w64-toolchain -c msys2`
+- `cd citeon`
+- `python setup.py build_ext --inplace`
+- `pip install .`
+
+#### Installing Cite-on for MacOS (in progress):
+
+Open cmd in the NeuroART folder and run the following commands:
+- `git clone https://gitlab.iit.it/fellin-public/cite-on.git`
+- `mv cite-on citeon` (Python doesn't like files with dashes.)
+- `conda env create -f citeonEnv.yml`
+- `conda activate citeon`
+- `conda install libpython-static -c msys2`
 - `cd citeon`
 - `python setup.py build_ext --inplace`
 - `pip install .`
