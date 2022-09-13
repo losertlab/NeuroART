@@ -49,8 +49,9 @@ Open cmd in the NeuroART folder and run the following commands:
 2. Run the main script "main_complete_RealTime.m";
 3. The first input dialog will appear on the screen as shown below.
 
-<img src="images/dialog1"  width="100" height="200">
-
+<p align="center">
+<img src="images/dialog1.png"  width="300" height=auto>
+</p>
 - *Average neuron radius*: in microns
 - *DF/F display width*: The number of frames of which you would like to observe the ΔF/F traces at a given time. (i.e., The length of the ΔF/F traces to be displayed in the app window). Please make sure that this number does not exceed the number of frames you are planning to collect as the initial batch for identifying cell locations.
 - *Experiment ID*: Output variables will be saved as a .mat file under this name.
