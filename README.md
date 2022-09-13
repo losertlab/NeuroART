@@ -52,6 +52,7 @@ Open cmd in the NeuroART folder and run the following commands:
 <p align="center">
 <img src="images/dialog1.png"  width="300" height=auto>
 </p>
+
 - *Average neuron radius*: in microns
 - *DF/F display width*: The number of frames of which you would like to observe the ΔF/F traces at a given time. (i.e., The length of the ΔF/F traces to be displayed in the app window). Please make sure that this number does not exceed the number of frames you are planning to collect as the initial batch for identifying cell locations.
 - *Experiment ID*: Output variables will be saved as a .mat file under this name.
@@ -74,7 +75,9 @@ After inputting all the parameters, click “Continue”.
 
 4. Next, specify the initial batch of frames (IDs of starting and ending frames) for cell identification. Make sure that the *length of the initial batch* is greater than or equal to the *DF/F display width*. Also, provide the *maximum number of frames* that will be collected during the experiment. This will be used as an upper bound for the total number of frames. Therefore, just provide an approximate number for this field.
 
-IMAGE HERE
+<p align="center">
+<img src="images/dialog2.png"  width="200" height=auto>
+</p>
 
 - *Figure updating frequency*: How frequently the figures/plots need to be updated in the GUI. (e.g., every 30 frames)
 - *Green channel ID*: For single channel data this field will be set to 1. For multi-channel data, specify which channel is the green channel. (e.g., Consider a two-channel dataset where the green channel is the second one. Then, green channel ID = 2)
@@ -89,22 +92,44 @@ IMAGE HERE
 7. If you selected the manual cell finding method on step 3, here you will manually select the cells which are visible in the mean image. Press the “Enter” key once
 cell clicking is complete. Press the “delete” key if you want to undo the previous click.
 
-IMAGE
+<p align="center">
+<img src="images/manual.png"  width="400" height=auto>
+</p>
 
-8. Wait until all the frames in the initial batch are motion corrected, denoised and ΔF/F traces are calculated for all the identified cells. After completion of these steps, you will be prompted to the dialog box shown below. If you want to continue analyzing the next incoming frames in real-time, click “Yes”. This is the beginning of the real-time loop of the NeuroART pipeline.
+8. Wait until all the frames in the initial batch are motion corrected, denoised and ΔF/F traces are calculated for all the identified cells. After completion of these steps, Real-time visualization will start. 
 
-9. After completing all the steps, the following window will appear. Select, “Start Real Time Analysis”
+<p align="center">
+<img src="images/realtime.png"  width="400" height=auto>
+</p>
+
+9. Select, “Start Real Time Analysis”
 to continue with the real-time analysis!
 
-10. The figure below indicates different features of the NeuroART GUI, which can be useful during the real-time analysis.
+<p align="center">
+<img src="images/realtimestart.png"  width="400" height=auto>
+</p>
+
+10. (update this) The figure below indicates different features of the NeuroART GUI, which can be useful during the real-time analysis.
+
+<p align="center">
+<img src="images/gui.png"  width="400" height=auto>
+</p>
 
 Use the slider at the bottom left corner to adjust the correlation analysis window size while the images are being acquired.
 Tuning analysis module can be turned on/off using the checkbox in the GUI.
 
 11. After the completion of an experiment, all the frames can be saved with labels in the TIF file format. (This is optional)
 
+<p align="center">
+<img src="images/savetifs.png"  width="300" height=auto>
+</p>
+
 12. After closing the app window, all the output variables can be found in a .mat file under the name
 provided as “Experiment ID”.
+
+<p align="center">
+<img src="images/savetuning.png"  width="300" height=auto>
+</p>
 
 
 
