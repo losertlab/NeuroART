@@ -1,4 +1,4 @@
-name: citeon_test
+name: citeon
 channels:
   - anaconda
   - defaults
@@ -33,5 +33,5 @@ dependencies:
     - tifffile==2020.5.11
     - tiffile==2018.10.18
     - PyQt5
-prefix: /opt/conda/envs/citeon_test
+prefix: /opt/conda/envs/citeon
 
