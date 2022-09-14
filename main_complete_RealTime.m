@@ -39,9 +39,9 @@ end
 ist = tic;
 fprintf('Image registration started ... \n');
 
-batchResults = readInitialBatch(inputParams, batchSettings, exptVars);
-
-if batchResults.wait == 10000
+try
+    batchResults = readInitialBatch(inputParams, batchSettings, exptVars);
+catch exception
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
     msgbox(promptMessage,'Error','error');  
     return;

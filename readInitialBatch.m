@@ -154,6 +154,9 @@ function batchResults = readInitialBatch(inputParams, batchSettings, exptVars)
         fh = -1; 
     end
     batchResults = struct('IMG', IMG, 'wait', wait, 'frameId', frameid, 'fh', fh, 'tStack', tstack);
-
+    if(batchResults.wait == 10000)
+        exception = MException("readInitialBatch:invalidParameter", 'Number of acquired images is insufficient to achieve the specified size of the initial batch');
+        throw(exception);
+    end
 end
 
