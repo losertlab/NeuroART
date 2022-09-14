@@ -39,16 +39,16 @@ end
 ist = tic;
 fprintf('Image registration started ... \n');
 
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams.imageFile,batchSettings.frameBlock,exptVars,batchSettings.GREENCHAN,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
+batchResults = readInitialBatch(inputParams, batchSettings, exptVars);
 
-if wait == 10000
+if batchResults.wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
     msgbox(promptMessage,'Error','error');  
     return;
 end
 
-I = (mean(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
-%I = (stdev(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Standard deviation image
+I = (mean(batchResults.IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
+%I = (stdev(batchResults.IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Standard deviation image
 fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
 imTemplate = fft2(fixed);
 
@@ -61,10 +61,10 @@ norm_meanRedIMG = [];
 if inputParams.RCHAN == 1 % if the red channel is not available
     for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
-%         error = dftregistration_coder_mex(imTemplate,fft2(IMG(:,:,j)),inputParams.dftResolution);
+%         error = dftregistration_coder_mex(imTemplate,fft2(batchResults.IMG(:,:,j)),inputParams.dftResolution);
 
-%         [regFrame,~,~] = regseqRT_coderGPU_mex(imTemplate,IMG(:,:,j));  % commented DZ 02/10/22
-        [regFrame,~,~] = regseqRT(imTemplate,IMG(:,:,j));
+%         [regFrame,~,~] = regseqRT_coderGPU_mex(imTemplate,batchResults.IMG(:,:,j));  % commented DZ 02/10/22
+        [regFrame,~,~] = regseqRT(imTemplate,batchResults.IMG(:,:,j));
 
         RegIMG(:,:,j) = gather(regFrame);
 %         ty(j) = ty; %error(3);
@@ -113,7 +113,7 @@ end
 % offsets = [ty' tx'];
    
 
-clear IMG I fixed 
+clear batchResults.IMG I fixed 
     
 tstop = toc(ist);
 fprintf('Initial aquisition and registration took %.4f seconds\n',tstop);
@@ -199,7 +199,7 @@ end
 
 %% Check whether enough number of frames are available
 
-numFrames = frameid - 1; % number of frames read upto now
+numFrames = batchResults.frameId - 1; % number of frames read upto now
 if (inputParams.DISPLAY > numFrames)
     promptMessage = sprintf('DF/F display window is larger than the available number of frames');
     msgbox(promptMessage,'Error','error');  
@@ -246,7 +246,7 @@ RTparams.numAvailFrames = numFrames;
 RTparams.imagingFreq = exptVars.frameRate;
 RTparams.thorSyncFile = rfParams.thorSyncFile;
 RTparams.psignalFile = rfParams.psignalFile;
-RTparams.rawFileHandle = fh;
+RTparams.rawFileHandle = batchResults.fh;
 RTparams.greenChannel = batchSettings.GREENCHAN;
 RTparams.numChannels = inputParams.NUMCHAN;
 RTparams.scope = inputParams.SCOPE;
@@ -254,7 +254,7 @@ RTparams.imgType = inputParams.FORMAT;
 RTparams.ImageFile = inputParams.imageFile;
 RTparams.JiSignalInfo = rfParams.JiSignalInfo;
 RTparams.norm_meanRedIMG = norm_meanRedIMG;
-RTparams.tstack = tstack;
+RTparams.tstack = batchResults.tStack;
 RTparams.dll_name = inputParams.dllName;
 RTparams.board_number = inputParams.boardNumber;
 RTparams.SLM_ON = inputParams.slmOn;
