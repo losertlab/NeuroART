@@ -56,7 +56,10 @@ function batchSettings = batchSettingsDialog(inputParams)
     Formats(5,1).items = cellstr(string(1:inputParams.NUMCHAN));
     
     [batchSettings,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
-    batchSettings.canceled = canceled;
+    if canceled
+        exception = MException("batchSettingsDialog:canceled", 'User canceled batch settings dialog.');
+        throw(exception);
+    end
     batchSettings.numInitFrames = batchSettings.END - batchSettings.START + 1; % Number of frames in the initial batch (used to detect ROIs)
     batchSettings.numImagesToRead = batchSettings.numInitFrames + batchSettings.BSIZE;
     batchSettings.frameBlock = batchSettings.START:batchSettings.END; % earlier was, fileInd:length(files)

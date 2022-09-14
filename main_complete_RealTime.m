@@ -21,10 +21,10 @@ end
 slmParams = slmInit(inputParams);
 
 %% Initial Batch Settings
-
-batchSettings = batchSettingsDialog(inputParams); % initial batch settings
-if batchSettings.canceled
-    return;
+try
+    batchSettings = batchSettingsDialog(inputParams); % initial batch settings
+catch exception
+    disp(exception.message);
 end
 
 rfParams = rfDialog(inputParams);
