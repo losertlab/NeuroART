@@ -47,73 +47,7 @@ if batchResults.wait == 10000
     return;
 end
 
-I = (mean(batchResults.IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
-%I = (stdev(batchResults.IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Standard deviation image
-fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
-imTemplate = fft2(fixed);
-
-tstop = toc(ist);
-fprintf('Initial aquisition took %.4f seconds\n',tstop);
-
-RegIMG = zeros( exptVars.dimY , exptVars.dimX , length(batchSettings.frameBlock), 'uint16');
-
-norm_meanRedIMG = [];
-if inputParams.RCHAN == 1 % if the red channel is not available
-    for j = 1:length(batchSettings.frameBlock)
-        % using Fourier transformation of images for registration
-%         error = dftregistration_coder_mex(imTemplate,fft2(batchResults.IMG(:,:,j)),inputParams.dftResolution);
-
-%         [regFrame,~,~] = regseqRT_coderGPU_mex(imTemplate,batchResults.IMG(:,:,j));  % commented DZ 02/10/22
-        [regFrame,~,~] = regseqRT(imTemplate,batchResults.IMG(:,:,j));
-
-        RegIMG(:,:,j) = gather(regFrame);
-%         ty(j) = ty; %error(3);
-%         tx(j) = tx; %error(4);
-    end
-else % Only valid for individual tif files spitted out by Bruker (2 channel data)
-        
-    RedIMG = nan(exptVars.dimX,exptVars.dimY,length(batchSettings.frameBlock)); %% change to length(fileInd:length(files))   
-    redID = 2;
-        
-    if batchSettings.GREENCHAN == 2
-        redID = 1; 
-    end
-
-    for i = 1:length(batchSettings.frameBlock)
-        fName = fullfile(inputParams.IMGFOLDER, [inputParams.IMG '_Ch' num2str(redID) '_' sprintf('%05d',i) '.ome' inputParams.FORMAT]); % Format of the Bruker tif filenames 
-        RedIMG(:,:,i)  = imread(fName);
-%             fh1 = fopen(files(batchSettings.START-1+i).name); % read raw image
-%             RedImg = reshape(fread(fh1,inf,'uint16=>uint16'),[exptVars.dimX, exptVars.dimY]);
-%             RedIMG(:,:,i)  = RedImg';
-%             fclose(fh1);
-        
-    end
-
-    clear files
-
-    cd(pwd)
-    
-    I = (mean(RedIMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
-    fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
-    imTemplate_red = fft2(fixed);
-        
-    for j = 1:length(batchSettings.frameBlock)
-        % using Fourier transformation of images for registration
-        error = dftregistration(imTemplate_red,fft2(RedIMG(:,:,j)),inputParams.dftResolution);
-        ty(j) = error(3);
-        tx(j) = error(4);
-    end
-        
-    meanIMG = mean(RedIMG,3); % Mean image for cell center clicking
-    norm_meanRedIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
-        
-    clear RedIMG RedImg imTemplate_red
-end
-
-% offsets = [ty' tx'];
-   
-
-clear batchResults.IMG I fixed 
+[imTemplate, regImg, normMeanRedImg] = registerImages(inputParams, batchSettings,batchResults, exptVars, ist);
     
 tstop = toc(ist);
 fprintf('Initial aquisition and registration took %.4f seconds\n',tstop);
@@ -124,8 +58,8 @@ iStart = tic;
 % promptMessage = sprintf('Select the method for cell finding');
 % button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
 if inputParams.CFIND == 1 % Manual
-%     meanIMG = std(double(RegIMG),0,3); % Mean image for cell center clicking
-    meanIMG = mean(double(RegIMG),3); % Mean image for cell center clicking
+%     meanIMG = std(double(regImg),0,3); % Mean image for cell center clicking
+    meanIMG = mean(double(regImg),3); % Mean image for cell center clicking
     norm_meanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
     figure; imagesc(norm_meanIMG); colormap('gray'); axis('square')
     SelectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
@@ -155,7 +89,7 @@ elseif inputParams.CFIND == 3 % Cite-on
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
 else
-    [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG); % CaImAn cell finder
+    [cell_centroids,~,~,~] = CaImAn_CellFinder(regImg); % CaImAn cell finder
 end
 %%
 close(gcf);
@@ -172,13 +106,13 @@ delete(gcp('nocreate'));
 
 neuropilSubPercent = 70; % use this default value for now
 if inputParams.ROI == 1 % no filled ROIs
-%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
+%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,regImg,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(regImg,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
 else
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(regImg,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
 end
 
-clear RegIMG
+clear regImg
 
 tstop = toc(ist);
 fprintf('total execution time for cell finding is %.4f seconds\n',tstop);
@@ -253,7 +187,7 @@ RTparams.scope = inputParams.SCOPE;
 RTparams.imgType = inputParams.FORMAT;
 RTparams.ImageFile = inputParams.imageFile;
 RTparams.JiSignalInfo = rfParams.JiSignalInfo;
-RTparams.norm_meanRedIMG = norm_meanRedIMG;
+RTparams.norm_meanRedIMG = normMeanRedImg;
 RTparams.tstack = batchResults.tStack;
 RTparams.dll_name = slmParams.dllName;
 RTparams.board_number = slmParams.boardNumber;
