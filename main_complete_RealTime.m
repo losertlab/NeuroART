@@ -16,7 +16,7 @@ end
 
 %% SLM Initialization (for photostimulation when the SLM is available)
 
-inputParams = slmInit(inputParams);
+slmParams = slmInit(inputParams);
 
 %% Initial Batch Settings
 
@@ -255,9 +255,9 @@ RTparams.ImageFile = inputParams.imageFile;
 RTparams.JiSignalInfo = rfParams.JiSignalInfo;
 RTparams.norm_meanRedIMG = norm_meanRedIMG;
 RTparams.tstack = batchResults.tStack;
-RTparams.dll_name = inputParams.dllName;
-RTparams.board_number = inputParams.boardNumber;
-RTparams.SLM_ON = inputParams.slmOn;
+RTparams.dll_name = slmParams.dllName;
+RTparams.board_number = slmParams.boardNumber;
+RTparams.SLM_ON = slmParams.slmOn;
 
 %% Real time analysis
 
