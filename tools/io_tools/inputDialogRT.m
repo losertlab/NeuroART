@@ -153,7 +153,10 @@ function inputParams = inputDialogRT()
     % DefAns.FQ = 30;
     
     [inputParams,canceled] = inputsdlg(Prompt,Title,Formats,DefAns,Options);
-    inputParams.canceled = canceled;
+    if canceled
+        exception = MException("inputDialogRT:canceled", 'User canceled input dialog.');
+        throw(exception);
+    end
     inputParams.FORMAT = formats{inputParams.FORMAT};
     
     inputParams.symmFlag = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5

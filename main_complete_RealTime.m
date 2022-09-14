@@ -9,8 +9,10 @@ addpath(genpath('BNS_SLM'));
 
 %% Input parameters for NeuroART
 
-inputParams = inputDialogRT(); % get input parameters from the user
-if inputParams.canceled
+try
+    inputParams = inputDialogRT(); % get input parameters from the user
+catch exception
+    disp(exception.message);
     return;
 end
 
