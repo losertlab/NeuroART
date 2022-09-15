@@ -5,6 +5,8 @@ addpath(genpath('tools'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
 
+genericErrorMessage = 'Error: ';
+
 %%% Create struct to parse input variables to RT app 09/01/2022
 
 %% Input parameters for NeuroART
@@ -12,7 +14,7 @@ addpath(genpath('BNS_SLM'));
 try
     inputParams = inputDialogRT(); % get input parameters from the user
 catch exception
-    disp(exception.message);
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
@@ -24,15 +26,17 @@ slmParams = slmInit(inputParams);
 try
     batchSettings = batchSettingsDialog(inputParams); % initial batch settings
 catch exception
-    disp(exception.message);
+    disp([genericErrorMessage, exception.message]);
+    return;
 end
 
 rfParams = rfDialog(inputParams);
 
 %% Reading experimental parameters and motion correction of the initial batch
-
-exptVars = exptVarsInit(inputParams, batchSettings);
-if (exptVars.error)
+try
+    exptVars = exptVarsInit(inputParams, batchSettings);
+catch exception
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
@@ -44,8 +48,8 @@ fprintf('Image registration started ... \n');
 try
     batchResults = readInitialBatch(inputParams, batchSettings, exptVars);
 catch exception
-    promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
-    msgbox(promptMessage,'Error','error');  
+    msgbox(exception.message,'Error','error');
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
