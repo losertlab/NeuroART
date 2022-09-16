@@ -5,11 +5,22 @@ function inputParams = inputDialogRT(inputConfig)
     %
     % Updated for additional functions F. Hatz 2013
     
-    if nargin < 1
-        inputConfig = struct;
-    end
-
     dataPath = [pwd, filesep];  % set datapath to current folder
+    
+    parts = strsplit(dataPath, filesep);
+    parent_folder = strjoin(parts(1:end-1), filesep);
+    DefAns = catstruct(struct( ...
+        'R', 5,...
+        'DISPLAY', 200,...
+        'EXID', 'RT_test1', ...
+        'IMGFOLDER', parent_folder,...
+        'IMG', 'Image_0001_0001', ...
+        'RF', 2, ...
+        'CFIND', 3, ...
+        'SLM', 1, ...
+        'CWINF', 5 ...
+        ), inputConfig);
+
     formats = {'.raw','.tif'};
     
     Title = 'Input Parameters';
@@ -24,7 +35,6 @@ function inputParams = inputDialogRT(inputConfig)
     Options.ButtonNames = {'Continue','Cancel'}; 
     Prompt = {};
     Formats = {};
-    DefAns = struct([]);
     
     % Prompt(1,:) = {['Please enter all the required input parameters'],[],[]};
     % Formats(1,1).type = 'text';
@@ -36,35 +46,28 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(1,1).format = 'integer';
     Formats(1,1).labelloc = 'leftmiddle';
     Formats(1,1).size = 50; % automatically assign the height
-    DefAns(1).R = condEval(inputConfig, 'R', 5);
     Prompt(end+1,:) = {'DF/F display width','DISPLAY','frames'};
     Formats(2,1).type = 'edit';
     Formats(2,1).format = 'integer';
     Formats(2,1).limits = [50 5000]; 
     Formats(2,1).size = 50;
     Formats(2,1).labelloc = 'leftmiddle';
-    DefAns.DISPLAY = condEval(inputConfig, 'DISPLAY', 200);
     
     Prompt(end+1,:) = {'Experiment ID','EXID',[]};
     Formats(3,1).type = 'edit';
     Formats(3,1).format = 'text';
     Formats(3,1).size = 200;
-    DefAns.EXID = condEval(inputConfig, 'EXID', 'RT_test1');
     
     Prompt(end+1,:) = {'Image folder','IMGFOLDER',[]};
     Formats(4,1).type = 'edit';
     Formats(4,1).format = 'dir';
     Formats(4,1).size = 250; %[-1 0];
     % parts = strsplit(pwd, filesep);
-    parts = strsplit(dataPath, filesep);
-    parent_folder = strjoin(parts(1:end-1), filesep);
-    DefAns.IMGFOLDER = condEval(inputConfig, 'IMGFOLDER', parent_folder);
     
     Prompt(end+1,:) = {'Image file name','IMG',[]};
     Formats(5,1).type = 'edit';
     Formats(5,1).format = 'text';
     Formats(5,1).size = 200;
-    DefAns.IMG = condEval(inputConfig, 'IMG', 'Image_0001_0001');
     
     Prompt(end+1,:) = {'Image format','FORMAT',[]};
     Formats(6,1).type = 'list';
@@ -90,7 +93,6 @@ function inputParams = inputDialogRT(inputConfig)
     % Formats(9,1).format = 'text';
     Formats(9,1).items = {'Yes','No'};
     % Formats(9,1).span = [2 1];  % item is 3 fields x 1 field
-    DefAns.RF = condEval(inputConfig, 'RF', 2);  
     
     Prompt(end+1,:) = {'Red Channel Available?','RCHAN',[]};
     Formats(10,1).type = 'list';
@@ -106,7 +108,6 @@ function inputParams = inputDialogRT(inputConfig)
     % Formats(11,1).format = 'text';
     Formats(11,1).items = {'Manual','CaImAn','Cite-on','From File'};
     % Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
-    DefAns.CFIND = condEval(inputConfig, 'CFIND', 3); 
     
     
     Prompt(end+1,:) = {'Spatial Light Modulator','SLM',[]};
@@ -115,7 +116,6 @@ function inputParams = inputDialogRT(inputConfig)
     % Formats(11,1).format = 'text';
     Formats(12,1).items = {'None','BNS','Other'};
     % Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
-    DefAns.SLM = condEval(inputConfig, 'SLM', 1); 
     
     Prompt(end+1,:) = {'ROI Type','ROI',[]};
     Formats(13,1).type = 'list';
@@ -145,8 +145,7 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(16,1).type = 'edit';
     Formats(16,1).format = 'integer';
     Formats(16,1).labelloc = 'leftmiddle';
-    Formats(16,1).size = 50; 
-    DefAns.CWINF = condEval(inputConfig, 'CWINF', 5);
+    Formats(16,1).size = 50;
     
     % Prompt(end+1,:) = {'Imaging Frequency','FQ','Hz'};
     % Formats(7,1).type = 'edit';

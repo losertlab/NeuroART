@@ -13,6 +13,7 @@
     - Parallel Computing Toolbox,
     - Signal Processing Toolbox,
     - MATLAB support for MinGW-w64 C/C++ Compiler (for Windows)
+    - CATSTRUCT external function (https://www.mathworks.com/matlabcentral/fileexchange/7842-catstruct)
 - Minimum of 10 Gb of space on hard drive;
 - (Optional) NVIDIA GPU with CUDA 10.2
 

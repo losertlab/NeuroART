@@ -4,6 +4,10 @@ close all
 addpath(genpath('tools'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
+configFileName = 'neuroArtConfig.json';
+if ~isfile(configFileName)
+    (neuroArtConfigInit(configFileName));
+end
 
 genericErrorMessage = 'Error: ';
 
@@ -11,10 +15,9 @@ genericErrorMessage = 'Error: ';
 
 %% Input parameters for NeuroART
 
-inputConfig = struct( ...
-    'IMGFOLDER', '/Users/noahchongsiriwatana/Downloads', ...
-    'IMG', 'greenchannel_6000' ...
-    );
+% Add your default parameters here.
+
+inputConfig = extractJSON(configFileName);
 try
     inputParams = inputDialogRT(inputConfig); % get input parameters from the user
 catch exception
