@@ -11,8 +11,12 @@ genericErrorMessage = 'Error: ';
 
 %% Input parameters for NeuroART
 
+inputConfig = struct( ...
+    'IMGFOLDER', '/Users/noahchongsiriwatana/Downloads', ...
+    'IMG', 'greenchannel_6000' ...
+    );
 try
-    inputParams = inputDialogRT(); % get input parameters from the user
+    inputParams = inputDialogRT(inputConfig); % get input parameters from the user
 catch exception
     disp([genericErrorMessage, exception.message]);
     return;
