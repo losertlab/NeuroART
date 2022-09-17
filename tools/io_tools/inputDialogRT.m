@@ -4,24 +4,8 @@ function inputParams = inputDialogRT(inputConfig)
     % Last Updated: May 5 2010
     %
     % Updated for additional functions F. Hatz 2013
-    
-    dataPath = [pwd, filesep];  % set datapath to current folder
-    
-    parts = strsplit(dataPath, filesep);
-    parent_folder = strjoin(parts(1:end-1), filesep);
-    DefAns = catstruct(struct( ...
-        'R', 5,...
-        'DISPLAY', 200,...
-        'EXID', 'RT_test1', ...
-        'IMGFOLDER', parent_folder,...
-        'IMG', 'Image_0001_0001', ...
-        'RF', 2, ...
-        'CFIND', 3, ...
-        'SLM', 1, ...
-        'CWINF', 5 ...
-        ), inputConfig);
-
-    formats = {'.raw','.tif'};
+   
+    DefAns = inputConfig.default;
     
     Title = 'Input Parameters';
     %%%% SETTING DIALOG OPTIONS
@@ -72,33 +56,33 @@ function inputParams = inputDialogRT(inputConfig)
     Prompt(end+1,:) = {'Image format','FORMAT',[]};
     Formats(6,1).type = 'list';
     Formats(6,1).style = 'popupmenu';
-    Formats(6,1).items = formats;
+    Formats(6,1).items = inputConfig.options.FORMAT;
     % DefAns.FORMAT = 'raw';
     
     Prompt(end+1,:) = {'Imaging system','SCOPE',[]};
     Formats(7,1).type = 'list';
     Formats(7,1).style = 'popupmenu';
-    Formats(7,1).items = {'Thorlabs B-Scope','Bruker Ultima 2P+','Bruker Ultima 2P','BEAMM(ScanImage)','MOM-Thors','Offline Mode'};
+    Formats(7,1).items = inputConfig.options.SCOPE;
     %DefAns.SCOPE = 'Thorlabs B-Scope';
     
     Prompt(end+1,:) = {'Number of channels','NUMCHAN',[]};
     Formats(8,1).type = 'list';
     Formats(8,1).style = 'popupmenu';
-    Formats(8,1).items = {'1','2','3','4'};
+    Formats(8,1).items = inputConfig.options.NUMCHAN;
     % DefAns.NUMCHAN = '1';
     
     Prompt(end+1,:) = {'Analyze Receptive Fields?','RF',[]};
     Formats(9,1).type = 'list';
     Formats(9,1).style = 'popupmenu';
     % Formats(9,1).format = 'text';
-    Formats(9,1).items = {'Yes','No'};
+    Formats(9,1).items = inputConfig.options.RF;
     % Formats(9,1).span = [2 1];  % item is 3 fields x 1 field
     
     Prompt(end+1,:) = {'Red Channel Available?','RCHAN',[]};
     Formats(10,1).type = 'list';
     Formats(10,1).style = 'popupmenu';
     % Formats(10,1).format = 'text';
-    Formats(10,1).items = {'No','Yes'};
+    Formats(10,1).items = inputConfig.options.RCHAN;
     % Formats(10,1).span = [2 1];  % item is 3 fields x 1 field
     % DefAns.RCHAN = 2; 
     
@@ -106,7 +90,7 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(11,1).type = 'list';
     Formats(11,1).style = 'popupmenu';
     % Formats(11,1).format = 'text';
-    Formats(11,1).items = {'Manual','CaImAn','Cite-on','From File'};
+    Formats(11,1).items = inputConfig.options.CFIND;
     % Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
     
     
@@ -114,14 +98,14 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(12,1).type = 'list';
     Formats(12,1).style = 'popupmenu';
     % Formats(11,1).format = 'text';
-    Formats(12,1).items = {'None','BNS','Other'};
+    Formats(12,1).items = inputConfig.options.SLM;
     % Formats(11,1).span = [4 1];  % item is 3 fields x 1 field
     
     Prompt(end+1,:) = {'ROI Type','ROI',[]};
     Formats(13,1).type = 'list';
     Formats(13,1).style = 'popupmenu';
     % Formats(12,1).format = 'text';
-    Formats(13,1).items = {'Not Filled','Filled'};
+    Formats(13,1).items = inputConfig.options.ROI;
     % Formats(12,1).span = [2 1];  % item is 3 fields x 1 field
     % DefAns.ROI = 2; 
     
@@ -129,7 +113,7 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(14,1).type = 'list';
     Formats(14,1).style = 'popupmenu';
     % Formats(13,1).format = 'text';
-    Formats(14,1).items = {'MST','Correlations'};
+    Formats(14,1).items = inputConfig.options.NET;
     % Formats(13,1).span = [2 1];  % item is 3 fields x 1 field
     % DefAns.NET = 1; 
     
@@ -137,7 +121,7 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(15,1).type = 'list';
     Formats(15,1).style = 'popupmenu';
     % Formats(14,1).format = 'text';
-    Formats(15,1).items = {'Cumulative','Fixed'};
+    Formats(15,1).items = inputConfig.options.CWIN;
     % Formats(14,1).span = [2 1];  % item is 3 fields x 1 field
     % DefAns.CWIN = 1; 
     
@@ -159,8 +143,8 @@ function inputParams = inputDialogRT(inputConfig)
         exception = MException("inputDialogRT:canceled", 'User canceled input dialog.');
         throw(exception);
     end
-    inputParams.FORMAT = formats{inputParams.FORMAT};
-    
+    inputParams.FORMAT = inputConfig.options.FORMAT{inputParams.FORMAT};
+
     inputParams.symmFlag = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5
     inputParams.smoothWin = 9; %3             % window size used to smooth fluorescence intensity (F) traces
     inputParams.winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity

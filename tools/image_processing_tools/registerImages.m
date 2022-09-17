@@ -10,7 +10,7 @@ function [imTemplate, regImg, normMeanRedImg] = registerImages(inputParams, batc
     regImg = zeros( exptVars.dimY , exptVars.dimX , length(batchSettings.frameBlock), 'uint16');
     
     normMeanRedImg = [];
-    if inputParams.RCHAN == 1 % if the red channel is not available
+    if inputParams.RCHAN == 2 % if the red channel is not available
         for j = 1:length(batchSettings.frameBlock)
             % using Fourier transformation of images for registration
     %         error = dftregistration_coder_mex(imTemplate,fft2(batchResults.IMG(:,:,j)),inputParams.dftResolution);

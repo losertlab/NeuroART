@@ -63,7 +63,7 @@ end
 [imTemplate, regImg, normMeanRedImg] = registerImages(inputParams, batchSettings,batchResults, exptVars, ist);
     
 tstop = toc(ist);
-fprintf('Initial aquisition and registration took %.4f seconds\n',tstop);
+fprintf('Initial acquisition and registration took %.4f seconds\n',tstop);
     
 %% Detect centroids of the cells (ROIs)
 
