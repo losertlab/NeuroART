@@ -1,5 +1,5 @@
 close all
-clear all
+clearvars
 
 addpath(genpath('tools'));
 addpath(genpath('Psignal'));
@@ -74,11 +74,8 @@ cell_centroids = detectCellCentroids(inputParams.CFIND, regImg);
 %%
 close(gcf);
 
-numOfCells = length(cell_centroids);
-tstop = toc(iStart);
-    
-fprintf('Total number of cells detected: %d \n',numOfCells);
-fprintf('Cell finding took %.4f seconds\n',tstop);
+fprintf('Total number of cells detected: %d \n',length(cell_centroids));
+fprintf('Cell finding took %.4f seconds\n',toc(iStart));
 
 delete(gcp('nocreate'));
     
