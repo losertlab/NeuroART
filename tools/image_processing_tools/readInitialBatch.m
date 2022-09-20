@@ -76,9 +76,9 @@ function batchResults = readInitialBatch(inputParams, batchSettings, exptVars)
     elseif (inputParams.SCOPE == 6 && inputParams.FORMAT == ".tif")
         frameid = 1;
         wait = 0;
-        %dimX = exptVars.dimX;
-        %dimY = exptVars.dimY;
-        %frameSize = dimX*dimY;
+        dimX = exptVars.dimX;
+        dimY = exptVars.dimY;
+        frameSize = dimX*dimY;
         
         %% Tiff reading code written by Nick 09/15
         warning('off','all') % Suppress all the tiff warnings
@@ -154,9 +154,6 @@ function batchResults = readInitialBatch(inputParams, batchSettings, exptVars)
         fh = -1; 
     end
     batchResults = struct('IMG', IMG, 'wait', wait, 'frameId', frameid, 'fh', fh, 'tStack', tstack);
-    if(batchResults.wait == 10000)
-        exception = MException("readInitialBatch:invalidParameter", 'Number of acquired images is insufficient to achieve the specified size of the initial batch');
-        throw(exception);
-    end
+
 end
 

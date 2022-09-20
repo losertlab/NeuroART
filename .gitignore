@@ -1,5 +1,6 @@
 *.csv
 *.mat
+*.json
 
 citeon/
 Labelled_Neurons_RT_test1/

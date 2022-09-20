@@ -13,6 +13,7 @@
     - Parallel Computing Toolbox,
     - Signal Processing Toolbox,
     - MATLAB support for MinGW-w64 C/C++ Compiler (for Windows)
+    - CATSTRUCT external function (https://www.mathworks.com/matlabcentral/fileexchange/7842-catstruct)
 - Minimum of 10 Gb of space on hard drive;
 - (Optional) NVIDIA GPU with CUDA 10.2
 
@@ -59,6 +60,7 @@ Open cmd in the NeuroART folder and run the following commands:
 
 1. Open the NeuroART folder in MATLAB;
 2. Run the main script "main_complete_RealTime.m";
+3. The first time you run NeuroART, NeuroART/neuroArtConfig.json will be created. Update NeuroART/neuroArtConfig.json to specify your python path as well as default parameters.
 3. The first input dialog will appear on the screen as shown below.
 
 <p align="center">
