@@ -4,10 +4,15 @@ clearvars
 addpath(genpath('tools'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
+
+% Check for or initialize config file.
 configFileName = 'neuroArtConfig.json';
 if ~isfile(configFileName)
     (neuroArtConfigInit(configFileName));
 end
+
+% Initialize python environment.
+pythonInit();
 
 genericErrorMessage = 'Error: ';
 
