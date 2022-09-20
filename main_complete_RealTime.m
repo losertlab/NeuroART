@@ -10,6 +10,7 @@ configFileName = 'neuroArtConfig.json';
 if ~isfile(configFileName)
     (neuroArtConfigInit(configFileName));
 end
+inputConfig = extractJSON(configFileName);
 
 % Initialize python environment.
 pythonInit();
@@ -20,9 +21,6 @@ genericErrorMessage = 'Error: ';
 
 %% Input parameters for NeuroART
 
-% Add your default parameters here.
-
-inputConfig = extractJSON(configFileName);
 try
     inputParams = inputDialogRT(inputConfig); % get input parameters from the user
 catch exception
