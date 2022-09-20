@@ -1,8 +1,8 @@
-function cellCentroids = detectCellCentroids(cellFinderMethod,regImg)
+function cellCentroids = detectCellCentroids(batchSettings, exptVars, inputParams, regImg)
     % Find cell centers.
     % promptMessage = sprintf('Select the method for cell finding');
     % button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
-    if cellFinderMethod == 1 % Manual
+    if inputParams.CFIND == 1 % Manual
     %     meanIMG = std(double(regImg),0,3); % Mean image for cell center clicking
         meanIMG = mean(double(regImg),3); % Mean image for cell center clicking
         norm_meanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
@@ -13,7 +13,7 @@ function cellCentroids = detectCellCentroids(cellFinderMethod,regImg)
         cellCentroids(:,1) = yc;
         cellCentroids(:,2) = xc;
         clear xc yc
-    elseif cellFinderMethod == 4 % From File
+    elseif inputParams.CFIND == 4 % From File
         [file,path] = uigetfile; % select the .mat file which contains the variable, "ptsIdx": column 2 --> x, column 3 --> y coordinates
         if file == 0
             fprintf('No file was selected ... \n');
@@ -23,7 +23,7 @@ function cellCentroids = detectCellCentroids(cellFinderMethod,regImg)
             cellCentroids(:,1) = ptsIdx(:,2); %yc
             cellCentroids(:,2) = ptsIdx(:,3); %xc
         end
-    elseif cellFinderMethod == 3 % Cite-on
+    elseif inputParams.CFIND == 3 % Cite-on
     %%     system('activate cite-on & python test.py')
         ups = 2.0;
         th = 0.5;

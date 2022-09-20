@@ -75,7 +75,7 @@ fprintf('Initial acquisition and registration took %.4f seconds\n',tstop);
 iStart = tic;
 % promptMessage = sprintf('Select the method for cell finding');
 % button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
-cell_centroids = detectCellCentroids(inputParams.CFIND, regImg);
+cell_centroids = detectCellCentroids(batchSettings, exptVars, inputParams, regImg);
 %%
 close(gcf);
 
