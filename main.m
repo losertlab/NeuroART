@@ -54,24 +54,21 @@ fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime);
 %motion correction should  be independent of most experimental variables.
 %We should adapt the inputs for this function to be reused outside of
 %neuroart.
+[RegIMG,imTemplate] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
 
-% this output norm_meanRedIMG should probably be produced outside of this
-% function.
-
-[RegIMG,imTemplate,norm_meanRedIMG] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
+% Mean image and normalized mean image for cell center clicking and GUI:
+meanIMG = mean(RegIMG,3); 
+normMeanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
+% this used to be redIMG, or norm_redMeanIMG. Is there a use for this that
+% is separate for the red channel? 
     
 registrationTime = toc(time);
 fprintf('Registration took %.4f seconds\n',registrationTime - aquisitionTime);
     
 %% Detect centroids of the cells (ROIs)
 
-% promptMessage = sprintf('Select the method for cell finding');
-% button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
 if inputParams.CFIND == 1 % Manual
-%     meanIMG = std(double(RegIMG),0,3); % Mean image for cell center clicking
-    meanIMG = mean(double(RegIMG),3); % Mean image for cell center clicking
-    norm_meanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
-    figure; imagesc(norm_meanIMG); colormap('gray'); axis('square')
+    figure; imagesc(normMeanIMG); colormap('gray'); axis('square')
     SelectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
     disp ( SelectText );
     [xc, yc] = getpts; %  manually select centers of the neurons
@@ -92,23 +89,33 @@ elseif inputParams.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
     ups = 2.0; % upscaling factor
     th = 0.5;  % threshold
-    [~,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile ' -u ' num2str(ups) ' -t ' num2str(th)]);
-    %disp(b);
+    [~,cmdOutput] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile ' -u ' num2str(ups) ' -t ' num2str(th)]);
+    %disp(cmdOutput);
     T = readtable('cell_coordinates.csv');
     
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
 else
     % introduce caiman parameters here
-    [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG); % CaImAn cell finder
+    caimanParams.tau = exptVars.rPixels;    % number of components to be found *
+    caimanParams.K = 185;                   % number of components to be found *
+    caimanParams.decayTime = 50;            % typical transient time  *
+    caimanParams.pOrder = 2;                % order of AR dynamics    *
+    caimanParams.nBackground = 2;           % number of background components    *
+    caimanParams.minSnr = 2;                % minimum SNR threshold
+    caimanParams.mergeThr = 0.8;            % merging threshold       *
+    caimanParams.spaceThr = 0.3;            % space correlation threshold (dataset3 --> 0.3)
+    caimanParams.cnnThr = 0.2;              % threshold for CNN classifier 
+    caimanParams.frameRate = exptVars.frameRate;
+    [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG,caimanParams); % CaImAn cell finder
 end
 %%
 close(gcf);
 
-numOfCells = length(cell_centroids);
+numCells = length(cell_centroids);
 segmentationTime = toc(time);
     
-fprintf('Total number of cells detected: %d. \n',numOfCells);
+fprintf('Total number of cells detected: %d. \n',numCells);
 fprintf('Cell finding took %.4f seconds.\n',segmentationTime - registrationTime);
 
 delete(gcp('nocreate'));
@@ -118,14 +125,13 @@ delete(gcp('nocreate'));
 neuropilSubPercent = 70; % use this default value for now
 
 % shorten parameter list (create struct dffInput, dffOutput...)
+% need work on the computeDFF functions. There is a lot to be done here.
 if inputParams.ROI == 1 % no filled ROIs
 %     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
 else
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
 end
-
-clear RegIMG
 
 computedffTime = toc(time);
 fprintf('dF/F computation took %.4f seconds. \n',computedffTime-segmentationTime);
@@ -160,7 +166,7 @@ if (mstWin > numFrames)
 	return;
 end
 
-r_display = floor(exptVars.rPixels*0.4); % display smaller size patches
+rDisplay = floor(exptVars.rPixels*0.4); % display smaller size patches
 
 
 %% Create struct of input parameters for real time analysis
@@ -176,7 +182,7 @@ RTparams.ycRaw = ycRaw;
 RTparams.norm_meanIMG = norm_meanIMG;
 RTparams.symmFLAG = inputParams.symmFlag;
 RTparams.smoothwin = inputParams.smoothWin;
-RTparams.r = r_display;
+RTparams.r = rDisplay;
 RTparams.dffwindow = exptVars.dffWindow;
 RTparams.percent = inputParams.fluorPercentile;
 RTparams.last_init_frame = batchSettings.END;
@@ -201,7 +207,7 @@ RTparams.scope = inputParams.SCOPE;
 RTparams.imgType = inputParams.FORMAT;
 RTparams.ImageFile = inputParams.imageFile;
 RTparams.JiSignalInfo = rfParams.JiSignalInfo;
-RTparams.norm_meanRedIMG = norm_meanRedIMG;
+RTparams.norm_meanRedIMG = normMeanIMG;
 RTparams.tstack = tstack;
 RTparams.dll_name = inputParams.dllName;
 RTparams.board_number = inputParams.boardNumber;
@@ -210,5 +216,5 @@ RTparams.SLM_ON = inputParams.slmOn;
 %% Real time analysis
 
 realTimeApp(RTparams);
-rmpath(genpath('utilities'));
+rmpath(genpath('tools'));
 rmpath(genpath('Psignal')); % path to Psignal folder

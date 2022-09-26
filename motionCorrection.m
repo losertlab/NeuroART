@@ -1,7 +1,5 @@
-function [regImg,imTemplate,norm_meanRedIMG] = motionCorrection(IMG,exptVars,inputParams,batchSettings)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
+function [regImg,imTemplate] = motionCorrection(IMG,exptVars,inputParams,batchSettings)
+%UNTITLED Motion correction for neuroart
 
 I = (mean(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Mean image
 %I = (stdev(IMG(:,:,1:length(batchSettings.frameBlock)),3)); % Standard deviation image
@@ -9,9 +7,8 @@ fixed = (I - min(I(:)))./range(I(:)); % scale the intensities [0 1]
 imTemplate = fft2(fixed);
 
 
-regImg = zeros( exptVars.dimY , exptVars.dimX , length(batchSettings.frameBlock), 'uint16');
+regImg = zeros(exptVars.dimX, exptVars.dimY, length(batchSettings.frameBlock), 'uint16');
 
-norm_meanRedIMG = [];
 if inputParams.RCHAN == 1 % if the red channel is not available
     for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
@@ -58,10 +55,7 @@ else % Only valid for individual tif files spitted out by Bruker (2 channel data
         ty(j) = error(3);
         tx(j) = error(4);
     end
-        
-    meanIMG = mean(RedIMG,3); % Mean image for cell center clicking
-    norm_meanRedIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
-        
+      
 end
 
 end
