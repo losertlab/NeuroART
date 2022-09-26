@@ -6,7 +6,7 @@ addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
 
 % for debugging:
-verbose = 0; % 1 for printing command window outputs; 0 for suppressing.
+verbose = 1; % 1 for printing command window outputs; 0 for suppressing.
 
 %%% Create struct to parse input variables to RT app 09/01/2022
 
