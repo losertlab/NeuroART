@@ -39,10 +39,8 @@ end
 time = tic;
 fprintf('Image registration started ... \n');
 
-% reduce this list of parameters. The input should be just inputParams, and
-% the rest should be unpacked inside this function. Also, this function is
-% quite large. Should be broken up into smaller pieces.
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams.imageFile,batchSettings.frameBlock,exptVars,batchSettings.GREENCHAN,inputParams.NUMCHAN,inputParams.SCOPE,inputParams.FORMAT);
+% this function is quite large. Should be broken up into smaller pieces.
+[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams,batchSettings,exptVars);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');

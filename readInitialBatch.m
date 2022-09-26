@@ -1,4 +1,14 @@
-function [IMG, wait, frameid, fh, tstack] = readInitialBatch(fileName,frameBlock,exptVars,greenChannel,numChannels,scope,imgType)
+function [IMG, wait, frameid, fh, tstack] = readInitialBatch(inputParams,batchSettings,exptVars)
+
+%fileName,frameBlock,exptVars,greenChannel,numChannels,scope,imgType)
+
+fileName = inputParams.imageFile;
+numChannels = inputParams.NUMCHAN;
+scope = inputParams.SCOPE;
+imgType = inputParams.FORMAT;
+
+frameBlock = batchSettings.frameBlock;
+greenChannel = batchSettings.GREENCHAN;
 
 % scope: 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
 tstack = [];
