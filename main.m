@@ -5,6 +5,9 @@ addpath(genpath('tools'));
 addpath(genpath('Psignal'));
 addpath(genpath('BNS_SLM'));
 
+% for debugging:
+verbose = 0; % 1 for printing command window outputs; 0 for suppressing.
+
 %%% Create struct to parse input variables to RT app 09/01/2022
 
 %% Input parameters for NeuroART
@@ -29,7 +32,8 @@ rfParams = rfDialog(inputParams);
 
 %% Reading experimental parameters and motion correction of the initial batch
 
-exptVars = exptVarsInit(inputParams, batchSettings);
+[exptTextOutput, exptVars] = evalc('exptVarsInit(inputParams, batchSettings)');
+if verbose, disp(exptTextOutput), end
 if (exptVars.error)
     return;
 end
@@ -37,7 +41,7 @@ end
 %% Read the frames in iteratively
 
 time = tic;
-fprintf('Image registration started ... \n');
+if verbose, fprintf('Image registration started ... \n'),end
 
 % this function is quite large. Should be broken up into smaller pieces.
 [IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams,batchSettings,exptVars);
@@ -49,7 +53,7 @@ if wait == 10000
 end
 
 aquisitionTime = toc(time);
-fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime);
+if verbose, fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime), end
 
 %motion correction should  be independent of most experimental variables.
 %We should adapt the inputs for this function to be reused outside of
@@ -63,14 +67,14 @@ normMeanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(
 % is separate for the red channel? 
     
 registrationTime = toc(time);
-fprintf('Registration took %.4f seconds\n',registrationTime - aquisitionTime);
+if verbose, fprintf('Registration took %.4f seconds\n',registrationTime - aquisitionTime), end
     
 %% Detect centroids of the cells (ROIs)
 
 if inputParams.CFIND == 1 % Manual
     figure; imagesc(normMeanIMG); colormap('gray'); axis('square')
-    SelectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
-    disp ( SelectText );
+    selectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
+    if verbose, disp (selectText),end
     [xc, yc] = getpts; %  manually select centers of the neurons
     cell_centroids(:,1) = yc;
     cell_centroids(:,2) = xc;
@@ -96,7 +100,6 @@ elseif inputParams.CFIND == 3 % Cite-on
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
 else
-    % introduce caiman parameters here
     caimanParams.tau = exptVars.rPixels;    % number of components to be found *
     caimanParams.K = 185;                   % number of components to be found *
     caimanParams.decayTime = 50;            % typical transient time  *
@@ -107,7 +110,13 @@ else
     caimanParams.spaceThr = 0.3;            % space correlation threshold (dataset3 --> 0.3)
     caimanParams.cnnThr = 0.2;              % threshold for CNN classifier 
     caimanParams.frameRate = exptVars.frameRate;
-    [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG,caimanParams); % CaImAn cell finder
+    
+    if ~verbose
+        [caimanTextOutput,cell_centroids,~,~,~] = evalc('CaImAn_CellFinder(RegIMG,caimanParams)'); % suppressing printed statements
+    else
+        [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG,caimanParams); % CaImAn cell finder
+    end
+    
 end
 %%
 close(gcf);
@@ -115,8 +124,10 @@ close(gcf);
 numCells = length(cell_centroids);
 segmentationTime = toc(time);
     
-fprintf('Total number of cells detected: %d. \n',numCells);
-fprintf('Cell finding took %.4f seconds.\n',segmentationTime - registrationTime);
+if verbose
+    fprintf('Total number of cells detected: %d. \n',numCells);
+    fprintf('Cell finding took %.4f seconds.\n',segmentationTime - registrationTime);
+end
 
 delete(gcp('nocreate'));
     
@@ -134,8 +145,10 @@ else
 end
 
 computedffTime = toc(time);
-fprintf('dF/F computation took %.4f seconds. \n',computedffTime-segmentationTime);
-fprintf('Total execution time for cell finding is %.4f seconds.\n',computedffTime);
+if verbose
+    fprintf('dF/F computation took %.4f seconds. \n',computedffTime-segmentationTime);
+    fprintf('Total execution time for cell finding is %.4f seconds.\n',computedffTime);
+end
 
 %% Real Time Visualization
 
