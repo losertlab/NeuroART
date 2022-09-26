@@ -36,7 +36,7 @@ end
 
 %% Read the frames in iteratively
 
-ist = tic;
+time = tic;
 fprintf('Image registration started ... \n');
 
 % reduce this list of parameters. The input should be just inputParams, and
@@ -50,17 +50,23 @@ if wait == 10000
     return;
 end
 
-tstop = toc(ist);
-fprintf('Initial aquisition took %.4f seconds\n',tstop);
+aquisitionTime = toc(time);
+fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime);
+
+%motion correction should  be independent of most experimental variables.
+%We should adapt the inputs for this function to be reused outside of
+%neuroart.
+
+% this output norm_meanRedIMG should probably be produced outside of this
+% function.
 
 [RegIMG,imTemplate,norm_meanRedIMG] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
     
-tstop = toc(ist);
-fprintf('Initial aquisition and registration took %.4f seconds\n',tstop);
+registrationTime = toc(time);
+fprintf('Registration took %.4f seconds\n',registrationTime - aquisitionTime);
     
 %% Detect centroids of the cells (ROIs)
 
-iStart = tic;
 % promptMessage = sprintf('Select the method for cell finding');
 % button = questdlg(promptMessage, 'Image Registration Completed', 'Manual', 'CaImAn', 'Cite-on', 'CaImAn'); % can't have more than 3 options
 if inputParams.CFIND == 1 % Manual
@@ -86,8 +92,8 @@ elseif inputParams.CFIND == 4 % From File
     end
 elseif inputParams.CFIND == 3 % Cite-on
 %%     system('activate cite-on & python test.py')
-    ups = 2.0;
-    th = 0.5;
+    ups = 2.0; % upscaling factor
+    th = 0.5;  % threshold
     [~,b] = system(['activate cite-on & python test.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile ' -u ' num2str(ups) ' -t ' num2str(th)]);
     %disp(b);
     T = readtable('cell_coordinates.csv');
@@ -95,22 +101,25 @@ elseif inputParams.CFIND == 3 % Cite-on
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
 else
+    % introduce caiman parameters here
     [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG); % CaImAn cell finder
 end
 %%
 close(gcf);
 
 numOfCells = length(cell_centroids);
-tstop = toc(iStart);
+segmentationTime = toc(time);
     
-fprintf('Total number of cells detected: %d \n',numOfCells);
-fprintf('Cell finding took %.4f seconds\n',tstop);
+fprintf('Total number of cells detected: %d. \n',numOfCells);
+fprintf('Cell finding took %.4f seconds.\n',segmentationTime - registrationTime);
 
 delete(gcp('nocreate'));
     
 %% Compute DF/F
 
 neuropilSubPercent = 70; % use this default value for now
+
+% shorten parameter list (create struct dffInput, dffOutput...)
 if inputParams.ROI == 1 % no filled ROIs
 %     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
@@ -120,8 +129,9 @@ end
 
 clear RegIMG
 
-tstop = toc(ist);
-fprintf('total execution time for cell finding is %.4f seconds\n',tstop);
+computedffTime = toc(time);
+fprintf('dF/F computation took %.4f seconds. \n',computedffTime-segmentationTime);
+fprintf('Total execution time for cell finding is %.4f seconds.\n',computedffTime);
 
 %% Real Time Visualization
 
