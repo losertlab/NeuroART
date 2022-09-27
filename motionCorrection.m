@@ -9,7 +9,7 @@ imTemplate = fft2(fixed);
 
 regImg = zeros(exptVars.dimX, exptVars.dimY, length(batchSettings.frameBlock), 'uint16');
 
-if inputParams.RCHAN == 1 % if the red channel is not available
+if inputParams.RCHAN == 2 % if the red channel is not available
     for j = 1:length(batchSettings.frameBlock)
         % using Fourier transformation of images for registration
 %         error = dftregistration_coder_mex(imTemplate,fft2(IMG(:,:,j)),inputParams.dftResolution);

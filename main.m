@@ -77,10 +77,10 @@ if verbose, fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime), en
 %motion correction should  be independent of most experimental variables.
 %We should adapt the inputs for this function to be reused outside of
 %neuroart.
-[RegIMG,imTemplate] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
+[regImg,imTemplate] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
 
 % Mean image and normalized mean image for cell center clicking and GUI:
-meanIMG = mean(RegIMG,3); 
+meanIMG = mean(regImg,3); 
 normMeanIMG = (meanIMG - repmat(min(meanIMG(:)),size(meanIMG))) ./ repmat(range(meanIMG(:)),size(meanIMG));
 % this used to be redIMG, or norm_redMeanIMG. Is there a use for this that
 % is separate for the red channel? 
@@ -131,9 +131,9 @@ else
     caimanParams.frameRate = exptVars.frameRate;
     
     if ~verbose
-        [caimanTextOutput,cell_centroids,~,~,~] = evalc('CaImAn_CellFinder(RegIMG,caimanParams)'); % suppressing printed statements
+        [caimanTextOutput,cell_centroids,~,~,~] = evalc('CaImAn_CellFinder(regImg,caimanParams)'); % suppressing printed statements
     else
-        [cell_centroids,~,~,~] = CaImAn_CellFinder(RegIMG,caimanParams); % CaImAn cell finder
+        [cell_centroids,~,~,~] = CaImAn_CellFinder(regImg,caimanParams); % CaImAn cell finder
     end
     
 end
