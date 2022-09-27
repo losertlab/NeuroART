@@ -1,4 +1,4 @@
-function inputParamsNew = slmInit(inputParams)
+function slmParams = slmInit(inputParams)
     % Boulder Nonlinear Systems
     % Required firmware: Apr 16 2018 or later
     
@@ -60,5 +60,5 @@ function inputParamsNew = slmInit(inputParams)
             end
         end
     end
-    inputParamsNew = inputParams;
+    slmParams = inputParams;
 end

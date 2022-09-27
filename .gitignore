@@ -1,6 +1,7 @@
 *.csv
 *.mat
 *.asv
+*.json
 
 citeon/
 Labelled_Neurons*/

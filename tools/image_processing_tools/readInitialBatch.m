@@ -1,14 +1,4 @@
-function [IMG, wait, frameid, fh, tstack] = readInitialBatch(inputParams,batchSettings,exptVars)
-
-%fileName,frameBlock,exptVars,greenChannel,numChannels,scope,imgType)
-
-fileName = inputParams.imageFile;
-numChannels = inputParams.NUMCHAN;
-scope = inputParams.SCOPE;
-imgType = inputParams.FORMAT;
-
-frameBlock = batchSettings.frameBlock;
-greenChannel = batchSettings.GREENCHAN;
+function batchResults = readInitialBatch(inputParams, batchSettings, exptVars)
 
     % scope: 1) Thorlabs B-Scope 2) Bruker Ultima 2P+ 3) Bruker Ultima 2P 4) BEAMM(ScanImage) 5) MOM-Thors 6) Offline Mode
     tstack = [];
@@ -86,9 +76,9 @@ greenChannel = batchSettings.GREENCHAN;
     elseif (inputParams.SCOPE == 6 && inputParams.FORMAT == ".tif")
         frameid = 1;
         wait = 0;
-        %dimX = exptVars.dimX;
-        %dimY = exptVars.dimY;
-        %frameSize = dimX*dimY;
+        dimX = exptVars.dimX;
+        dimY = exptVars.dimY;
+        frameSize = dimX*dimY;
         
         %% Tiff reading code written by Nick 09/15
         warning('off','all') % Suppress all the tiff warnings
@@ -164,9 +154,6 @@ greenChannel = batchSettings.GREENCHAN;
         fh = -1; 
     end
     batchResults = struct('IMG', IMG, 'wait', wait, 'frameId', frameid, 'fh', fh, 'tStack', tstack);
-    if(batchResults.wait == 10000)
-        exception = MException("readInitialBatch:invalidParameter", 'Number of acquired images is insufficient to achieve the specified size of the initial batch');
-        throw(exception);
-    end
+
 end
 

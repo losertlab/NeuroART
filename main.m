@@ -1,5 +1,5 @@
 close all
-% clear
+clearvars
 
 addpath(genpath('tools'));
 addpath(genpath('Psignal'));
@@ -8,23 +8,40 @@ addpath(genpath('BNS_SLM'));
 % for debugging:
 verbose = 1; % 1 for printing command window outputs; 0 for suppressing.
 
+% Check for or initialize config file.
+configFileName = 'neuroArtConfig.json';
+if ~isfile(configFileName)
+    (neuroArtConfigInit(configFileName));
+    fprintf("Please update your neuroArtConfig.json");
+    return;
+end
+inputConfig = extractJSON(configFileName);
+
+% Initialize python environment.
+pythonInit();
+
+genericErrorMessage = 'Error: ';
+
 %%% Create struct to parse input variables to RT app 09/01/2022
 
 %% Input parameters for NeuroART
 
-inputParams = inputDialogRT(); % get input parameters from the user
-if inputParams.canceled
+try
+    inputParams = inputDialogRT(inputConfig); % get input parameters from the user
+catch exception
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
 %% SLM Initialization (for photostimulation when the SLM is available)
 
-inputParams = slmInit(inputParams);
+slmParams = slmInit(inputParams);
 
 %% Initial Batch Settings
-
-batchSettings = batchSettingsDialog(inputParams); % initial batch settings
-if batchSettings.canceled
+try
+    batchSettings = batchSettingsDialog(inputParams); % initial batch settings
+catch exception
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
@@ -32,9 +49,11 @@ rfParams = rfDialog(inputParams);
 
 %% Reading experimental parameters and motion correction of the initial batch
 
-[exptTextOutput, exptVars] = evalc('exptVarsInit(inputParams, batchSettings)');
-if verbose, disp(exptTextOutput), end
-if (exptVars.error)
+try
+    [exptTextOutput, exptVars] = evalc('exptVarsInit(inputParams, batchSettings)');
+    if verbose, disp(exptTextOutput), end
+catch exception
+    disp([genericErrorMessage, exception.message]);
     return;
 end
 
@@ -138,10 +157,10 @@ neuropilSubPercent = 70; % use this default value for now
 % shorten parameter list (create struct dffInput, dffOutput...)
 % need work on the computeDFF functions. There is a lot to be done here.
 if inputParams.ROI == 1 % no filled ROIs
-%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,RegIMG,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(RegIMG,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
+%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,regImg,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(regImg,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
 else
-    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(RegIMG,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
+    [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(regImg,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
 end
 
 computedffTime = toc(time);
