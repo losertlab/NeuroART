@@ -1,4 +1,4 @@
-function [extracted_centroids,ind_corr,ind_cnn,ind_exc] = CaImAn_CellFinder(Y)
+function [extracted_centroids,ind_corr,ind_cnn,ind_exc] = CaImAn_CellFinder(Y,params)
 % Input: Y = 2D motion corrected movie 
 % dimensions: dimX*dimY*numberofFrames 
 
@@ -16,29 +16,39 @@ addpath(genpath('deconvolution'));
  
 if ~isa(Y,'single');    Y = single(Y);  end         % convert to single
 
-[d1,d2,T] = size(Y);                                % dimensions of dataset
-d = d1*d2;                                          % total number of pixels
-
 %% Set parameters
 
-K = 250;                                          % number of components to be found
-tau = 5; %default = 5                             % std of gaussian kernel (half size of neuron) 
-p = 2;
+[d1,d2,T] = size(Y);              % dimensions of dataset
+d = d1*d2;                        % total number of pixels
+
+tau = params.tau;                 % std of gaussian kernel (usually neuron radius) 
+K = params.K;                     % number of components to be found *
+decayTime = params.decayTime;     % typical transient time  *
+p = params.pOrder;                % order of AR dynamics    *
+nBackground = params.nBackground; % number of background components    *
+minSnr = params.minSnr;           % minimum SNR threshold
+mergeThr = params.mergeThr;       % merging threshold       *
+spaceThr = params.spaceThr;       % space correlation threshold (dataset3 --> 0.3)
+cnnThr = params.cnnThr;           % threshold for CNN classifier 
+frameRate = params.frameRate;     % threshold for CNN classifier 
 
 options = CNMFSetParms(...   
-    'd1',d1,'d2',d2,...                         % dimensionality of the FOV
-    'p',p,...                                   % order of AR dynamics    
-    'gSig',tau,...                              % half size of neuron
-    'merge_thr',0.80,...                        % merging threshold  
-    'nb',2,...                                  % number of background components    
-    'min_SNR',3,...                             % minimum SNR threshold
-    'space_thresh',0.5,...                      % space correlation threshold (dataset3 --> 0.3)
-    'cnn_thr',0.2,...                            % threshold for CNN classifier 
-    'ssub',4,...                            % spatial downsampling factor 
-    'tsub',2, ...                            % temporal downsampling factor
-    'spatial_parallel',0, ...                % don't use parallel processing
-    'temporal_parallel',0 ...                % don't use parallel processing
+    'd1',d1,'d2',d2,...           % dimensionality of the FOV
+    'p',p,...                     % order of AR dynamics    *
+    'gSig',tau,...                % half size of neuron     *
+    'merge_thr',mergeThr,...      % merging threshold       *
+    'nb',nBackground,...          % number of background components    *
+    'min_SNR',minSnr,...          % minimum SNR threshold
+    'space_thresh',spaceThr,...   % space correlation threshold (dataset3 --> 0.3)
+    'cnn_thr',cnnThr,...          % threshold for CNN classifier 
+    'ssub',1,...                  % spatial downsampling factor  *
+    'tsub',1, ...                 % temporal downsampling factor *
+    'spatial_parallel',0, ...     % don't use parallel processing
+    'temporal_parallel',0, ...    % don't use parallel processing
+    'decay_time',decayTime, ...   % typical transient time *
+    'fr',frameRate ...
     );
+
 %% Data pre-processing
 
 [P,Y] = preprocess_data(Y,p);
