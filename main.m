@@ -13,7 +13,7 @@ configFileName = 'neuroArtConfig.json';
 if ~isfile(configFileName)
     (neuroArtConfigInit(configFileName));
     fprintf("Please update your neuroArtConfig.json");
-    return;
+
 end
 inputConfig = extractJSON(configFileName);
 
