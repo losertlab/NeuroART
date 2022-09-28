@@ -51,7 +51,6 @@ Open cmd in the NeuroART folder and run the following commands:
 - `ren cite-on citeon` (Python doesn't like files with dashes.)
 - `conda env create -f citeonEnv.yml`
 - `conda activate citeon`
-- `conda install libpython m2w64-toolchain -c msys2`
 - `cd citeon`
 - `python setup.py build_ext --inplace`
 - `pip install .`
