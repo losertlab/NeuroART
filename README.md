@@ -44,6 +44,17 @@ Open cmd in the NeuroART folder and run the following commands:
 - `python setup.py build_ext --inplace`
 - `pip install .`
 
+#### Installing Cite-on for Linux:
+
+Open cmd in the NeuroART folder and run the following commands:
+- `git clone https://gitlab.iit.it/fellin-public/cite-on.git`
+- `ren cite-on citeon` (Python doesn't like files with dashes.)
+- `conda env create -f citeonEnv.yml`
+- `conda activate citeon`
+- `cd citeon`
+- `python setup.py build_ext --inplace`
+- `pip install .`
+
 #### Installing Cite-on for MacOS (in progress):
 
 Open cmd in the NeuroART folder and run the following commands:
