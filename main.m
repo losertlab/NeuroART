@@ -118,6 +118,8 @@ elseif inputParams.CFIND == 3 % Cite-on
     
     cell_centroids(:,1) = T.Var2; %yc
     cell_centroids(:,2) = T.Var1; %xc 
+elseif inputConfig.python.use_python && inputParams.CFIND == 2
+    cell_centroids = locateCentroids(inputConfig.python.complex_dynamics_path, inputConfig.python.env);
 else
     caimanParams.tau = exptVars.rPixels;    % number of components to be found *
     caimanParams.K = 185;                   % number of components to be found *
