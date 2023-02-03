@@ -49,7 +49,6 @@ for itr = 1:subsetSize
     txtCommand = [txtCommand, string(targetCells(itr,1)), string(targetCells(itr,2))];  
     if stimParams.DStim == "True"
         txtCommand = [txtCommand, string(stimParams.zOffset)];  
-
     end
 end
  % Stimulation parameters: Duration(ms), Laser name, Laser power(tics),

@@ -1,4 +1,4 @@
-function [msk,I] = stimulateBNS_SLM(targetCells, stimParams)
+function [phaseMask,msk,I] = stimulateBNS_SLM(targetCells, stimParams)
 
 % Send stimulation coordinates to PrairieLink
 
@@ -10,7 +10,7 @@ function [msk,I] = stimulateBNS_SLM(targetCells, stimParams)
 nTargets = size(targetCells,1); % Total number of cells to be stimulated
 slmdim = 1536;
 mult_factor = 1.5; % high pixel mode
-zoom_factor = 1/6; % high pixel mode
+zoom_factor = 3/4; %1/6; % high pixel mode
 
 % % Normalize
 % targetCells(:,1) = (targetCells(:,1)-(dimX/2))/(dimX/2);
@@ -36,7 +36,11 @@ opts.slm_dims = [1536 1536]*mult_factor; % high pixel mode
 P = PMTToDHOT(xoff,yoff); 
 
 tstart = tic;
-[m, IMG]=dhot(P, opts, 1);
+[m, ~]=dhot(P, opts, 1);
+
+opts.zernike = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+[~, IMG]=dhot(P, opts, 1);  % added on 08/18/22 (calculated intensity pattern shows artifacts when zernike coefficients are non-zero)
+
 t = toc(tstart);
 fprintf('Time taken for dhot calculations before updating the display is %.2f seconds \n',t);
             
@@ -80,7 +84,9 @@ imwrite(theoriticalIntensity, 'theoriticalIntensity.tif');
 t = toc(tstart);
 fprintf('Time taken until after updating the beamlet display in the GUI is %.2f seconds \n',t);
 
-calllib(stimParams.dll_name, 'Write_overdrive_image', stimParams.board_number, phaseMask); % write to SLM
+if ~(stimParams.seqMode)
+    calllib(stimParams.dll_name, 'Write_overdrive_image', stimParams.board_number, phaseMask); % write to SLM
+end
            
 % t = toc(tstart);       
 % fprintf('Total time taken until after sending the phase mask to SLM is %.2f seconds \n',t);
