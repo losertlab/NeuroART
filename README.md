@@ -70,7 +70,7 @@ Open cmd in the NeuroART folder and run the following commands:
 ## Instructions 
 
 1. Open the NeuroART folder in MATLAB;
-2. Run the main script "main_complete_RealTime.m";
+2. Run the main script "main.m";
 3. The first time you run NeuroART, NeuroART/neuroArtConfig.json will be created. Update NeuroART/neuroArtConfig.json to specify your python path as well as default parameters. The fields you should change are:
   - Default dialog values via `neuroArtConfig.default`
   - Path to the complex_dynamics python toolbox via `neuroArtConfig.python.complex_dynamics_path`

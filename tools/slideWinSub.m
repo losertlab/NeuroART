@@ -21,7 +21,10 @@ for j = 1 : nRois
             percentWin = floor(percent/100*(rWin-lWin));
             tWin = sort(F(j,(lWin:rWin)),'ascend');
             F0 = mean(tWin(1:percentWin));
-            dFF(j,k) = 100 * (F(j,k)- F0) / F0;   
+            dFF(j,k) = 100 * (F(j,k)- F0) / F0;  
+%             if dFF(j,k) > 700
+%                 dFF(j,k) = F0; % added by DZ 031423 to handle glitches occured due to stimulation
+%             end
     end
     
 %     for k = 1 : nFrames

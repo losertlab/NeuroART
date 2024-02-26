@@ -45,13 +45,12 @@ end
 
 if filled
     % no NP subtraction for filled ROIs;
-    rawFluo = (rawFluo - minNpSubFluo)./maxAdjF; % Normalize to get rid of negative values
+    rawFluo = (rawFluo - minNpSubFluo)./maxAdjF;  % Normalize to get rid of negative values
 else
     rawFluo = (rawFluo - (percNP * npFluo) - minNpSubFluo)./maxAdjF; % Normalize to get rid of negative values
 end
 
 Fraw = horzcat(Fraw,rawFluo); % append the fluorencence of the latest frame to the end of the existing fluorenscence matrix
-
 
 t2 = toc(tst);
 tst = tic;
@@ -90,6 +89,9 @@ for j = 1:n
     
     for k = 1:smoothwin
         newDFF(j,k) = 100 * (f(end-k+1)- F0) / F0; 
+%         if newDFF(j,k) < -10
+%             newDFF(j,k) = 0; % added by DZ 031423 to handle glitches occured due to stimulation
+%         end
     end
       
 end

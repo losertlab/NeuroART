@@ -1,7 +1,7 @@
 % Rough first pass function for determing the most population-correlated
 % cells using noise correlations and minimum spanning tree sorting method
 % Zac Bowen 2019
-function cellRanking  = selectCorrNeuron(dff,mst)
+function cellRanking  = selectCorrNeuron(dff,mst,inactiveCells)
 
 R = triu(corrcoef(dff'),1); % upper traingular correlation coefficient matrix
 
@@ -13,13 +13,15 @@ if (mst)
     TMPedgeWeightsNoise = r + abs(R);
     edgeWeightsNoise = 1 - TMPedgeWeightsNoise; % Diagonal and lower triangle are zero
     G = getMST(edgeWeightsNoise');
-    cellDegList = degree(G);   
+    cellDegList = degree(G);
 else
     % Correlation based method (search for pairs of cells where the magnitude of correlation > 0.1)
     r = tril(corrcoef(dff'),-1); % lower traingular correlation coefficient matrix
     corr = abs(R+r) > 0.1;
     cellDegList = sum(corr,2);
 end
+
+cellDegList(inactiveCells) = 0; % DZ 031523 to remove inactive cells from the correlation analysis
 
 %% Rank the cells based on the degree of connectivity
 

@@ -26,7 +26,8 @@ function opts = dhot_opts()
                            
     % Zernike coefficients for abberation correction, added by Dulara for the abberation correction routine
     
-    opts.zernike = [-0.0075,-0.015,0,0,0.015,0,0,0,0,0,0,0,0,0]; % 081622 tip, tilt, ast2 hardcoded for now
+%     opts.zernike = [-0.0075,-0.015,0,0,0.015,0,0,0,0,0,0,0,0,0]; % 081622 tip, tilt, ast2 hardcoded for now
+    opts.zernike = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]; % DZ 031623
 %     
     opts.abberationCorrection = 1; % If this value is equal to 1, we are doing abberation correction, otherwise no abberation correction
     

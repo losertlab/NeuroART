@@ -25,7 +25,6 @@ configFileName = 'neuroArtConfig.json';
 if ~isfile(configFileName)
     (neuroArtConfigInit(configFileName));
     fprintf("Please update your neuroArtConfig.json \n");
-
 end
 inputConfig = extractJSON(configFileName);
 
@@ -62,7 +61,7 @@ rfParams = rfDialog(inputParams); % select files for analyzing receptive fields 
 %% Reading experimental parameters and motion correction of the initial batch
 
 try
-    inputParams.frameRate = 10; % frameRate = 10, for images acquired from micromanager
+    inputParams.frameRate = 15; % frameRate = 10, for images acquired from micromanager
     [exptTextOutput, exptVars] = evalc('exptVarsInit(inputParams, batchSettings)');
     if verbose, disp(exptTextOutput), end
 catch exception
@@ -102,7 +101,7 @@ if verbose, fprintf('Registration took %.4f seconds\n',registrationTime - aquisi
 %% Detect centroids of the cells (ROIs)
 
 if inputParams.CFIND == 1 % Manual
-    figure; imagesc(normMeanIMG); colormap('gray'); axis('square'); caxis([0 0.3]);
+    figure; imagesc(normMeanIMG); colormap('gray'); axis('square'); caxis([0 0.75]);
     selectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
     if verbose, disp (selectText),end
     [xc, yc] = getpts; %  manually select centers of the neurons
