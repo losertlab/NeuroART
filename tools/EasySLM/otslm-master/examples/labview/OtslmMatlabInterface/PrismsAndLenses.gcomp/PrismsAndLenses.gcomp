@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SourceFile Checksum="F0F545A5EEB7D62254CF75691F4ADB2BA99AB34E3D666C62503C257873584091487EB368BF0F4E424A07FCCA328B703CE73B419708BC95C34595D1B9A5EC0C8F" Timestamp="1D574415A05426E" xmlns="http://www.ni.com/PlatformFramework">
+	<SourceModelFeatureSet>
+		<ParsableNamespace AssemblyFileVersion="6.4.0.49504" FeatureSetName="GComponentFeatureSet" Name="http://www.ni.com/GComponent.xsd" OldestCompatibleVersion="6.1.0.1" Version="6.2.0.49152" />
+		<ParsableNamespace AssemblyFileVersion="6.4.0.49504" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="6.2.0.49154" Version="6.2.0.49154" />
+		<ApplicationVersionInfo Build="6.4.0.49504" Name="LabVIEW NXG" Version="3.1.0" />
+	</SourceModelFeatureSet>
+	<ComponentDefinition DefaultConfigurationName="Configuration1" Id="d75997050ff44670b57777472296a2dd" RootNamespaceId="2a75d43317cc4f6ea9fb98212f0c0a12" xmlns="http://www.ni.com/GComponent.xsd">
+		<Icon Id="37bfd6f596df4d7da078c40874a99c98" ListViewIconCrop="0 0 40 40" xmlns="http://www.ni.com/PlatformFramework">
+			<IconPanel Height="[float]40" Id="37cf711cba5648a193909b986c30910a" Left="[float]0" MinHeight="[float]0" MinWidth="[float]0" PanelSizeMode="Resize" Top="[float]0" Width="[float]40">
+				<IconTemplate Height="[float]40" Id="af6349e3289e44238931a3bb73696937" Left="[float]0" TemplateName="[string]Blank" Top="[float]0" Width="[float]40" />
+			</IconPanel>
+		</Icon>
+		<CompilerSymbolTable Id="f542de9e138b4b63a30bf090f68c7f09" xmlns="http://www.ni.com/PlatformFramework" />
+		<ComponentConfiguration ComponentSubtypeIdentifier="Application" Id="6ea0ba79e4d54273b9d2f997db65b6cb" Name="Configuration1">
+			<CompilerSymbolTable Id="2dc1af6928d448efaa65056ffef05c03" xmlns="http://www.ni.com/PlatformFramework" />
+			<NativeApplicationOutputTypeProperties Id="7880f2b9bb444e299af0d7d3a5df82e7" />
+			<ComponentItemProperties AssociatedEnvoyId="560548dde34a44878de04701315498ef" Id="af233f3ba2cb4689b55c8a915868722c" TopLevel="True" />
+		</ComponentConfiguration>
+	</ComponentDefinition>
+	<EnvoyManagerFile Id="851719ae93884cf9a9bc44857884dd08" xmlns="http://www.ni.com/PlatformFramework">
+		<ProjectSettings Id="a1f1f0b9a6e4451aa7728b1c045a05bb" ModelDefinitionType="ProjectSettings" Name="ZProjectSettings" />
+		<EmbeddedDefinitionReference Id="58190c2659b34ead8c728da0849cec60" ModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentDefinitionEnvoyHierarchyRoot" Name="Global namespace">
+			<ComponentDefinitionEnvoyHierarchyRoot xmlns="http://www.ni.com/GComponent.xsd" />
+			<NameScopingEnvoy AutomaticallyResolveUp="True" Id="2a75d43317cc4f6ea9fb98212f0c0a12" Name="PrismsAndLenses">
+				<SourceFileReference Id="560548dde34a44878de04701315498ef" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="FrontPanel.gvi" StoragePath="FrontPanel.gvi" />
+				<SourceFileReference Id="9314ca2af1e7457f8d308dfe55d0da29" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="GenerateImages.gvi" StoragePath="GenerateImages.gvi" />
+			</NameScopingEnvoy>
+		</EmbeddedDefinitionReference>
+		<NameScopingEnvoy Id="6790a81c98141c794c33c3bc297a2d0" ModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentDefinitionContentReferenceRoot" Name="PrismsAndLenses.gcomp" NameTracksFileName="True">
+			<ComponentDefinitionContentReferenceRoot xmlns="http://www.ni.com/GComponent.xsd" />
+			<ContentReference ContentIdentifier="6ea0ba79e4d54273b9d2f997db65b6cb" Id="b7a8a1cb620e4ccca4048a8616c6ce37" Name="Configuration1" OverridingModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentConfiguration" />
+		</NameScopingEnvoy>
+	</EnvoyManagerFile>
+</SourceFile>

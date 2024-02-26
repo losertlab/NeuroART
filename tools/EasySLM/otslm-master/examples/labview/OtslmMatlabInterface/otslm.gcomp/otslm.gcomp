@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SourceFile Checksum="C99BBD71EDA4DD2F13CC7151C9DB358A25AB33274D61E31FCF680BB5348CF5F712B76F69925E4810243C82209DE51BBA818F0D636ED5511EF8147E811E79A6DC" Timestamp="1D574D3F2406759" xmlns="http://www.ni.com/PlatformFramework">
+	<SourceModelFeatureSet>
+		<ParsableNamespace AssemblyFileVersion="6.4.0.49504" FeatureSetName="GComponentFeatureSet" Name="http://www.ni.com/GComponent.xsd" OldestCompatibleVersion="6.1.0.1" Version="6.2.0.49152" />
+		<ParsableNamespace AssemblyFileVersion="6.4.0.49504" FeatureSetName="Interface for MATLAB®" Name="http://www.ni.com/Matlab" OldestCompatibleVersion="5.3.1.49152" Version="5.3.1.49152" />
+		<ParsableNamespace AssemblyFileVersion="6.4.0.49504" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="6.2.0.49154" Version="6.2.0.49154" />
+		<ApplicationVersionInfo Build="6.4.0.49504" Name="LabVIEW NXG" Version="3.1.0" />
+	</SourceModelFeatureSet>
+	<ComponentDefinition DefaultConfigurationName="Configuration1" Id="4ac1219f7d224ffa91ce3a8009ffc9f8" RootNamespaceId="7439bcf559d24e19b3146054bdd5cb69" xmlns="http://www.ni.com/GComponent.xsd">
+		<Icon Id="8119e7534132499baf683cd6ca9df0a8" ListViewIconCrop="0 0 40 40" xmlns="http://www.ni.com/PlatformFramework">
+			<IconPanel Height="[float]40" Id="c0d5c81292d34e0a80a1efc801c526b3" Left="[float]0" MinHeight="[float]0" MinWidth="[float]0" PanelSizeMode="Resize" Top="[float]0" Width="[float]40">
+				<IconTemplate Height="[float]40" Id="249c31cc30c94b8eb6adc7a12f5ec9e5" Left="[float]0" TemplateName="[string]Blank" Top="[float]0" Width="[float]40" />
+			</IconPanel>
+		</Icon>
+		<CompilerSymbolTable Id="208c7fbc57d24f62b702afaf3e1f7ae6" xmlns="http://www.ni.com/PlatformFramework" />
+		<ComponentConfiguration Id="a5486d61f989469e88b92533c387e32d" Name="Configuration1">
+			<CompilerSymbolTable Id="2c1d3fa8560546b6823caf955d22e1ce" xmlns="http://www.ni.com/PlatformFramework" />
+			<ComponentItemProperties AssociatedEnvoyId="e9bafd3520ce454c87196d2d538742e8" Exported="True" Id="3ca083b065c04e4d85def7849e015646" />
+			<ComponentItemProperties AssociatedEnvoyId="d35433f5cd73477baf8d72ab38cd5abe" Exported="True" Id="f7e24bb1acda4b58b2a05c235885b6c9" />
+			<ComponentItemProperties AssociatedEnvoyId="40c97f690a4e48408ed24368da69e38a" Exported="True" Id="def4ee16eaf5449f8ee337fe3eb405e4" />
+			<ComponentItemProperties AssociatedEnvoyId="cf6273ffecc24a608c31bc7c772df160" Exported="True" Id="da95611a1d7441a6853ea2a0d897d402" />
+			<ComponentItemProperties AssociatedEnvoyId="b0d23e5d99bc4cd19554b1fc34f214f4" Exported="True" Id="a597baf55b4a4313b6e3b8b412217796" />
+			<ComponentItemProperties AssociatedEnvoyId="135e79c8037f4de2bdb7cf9f4d046084" Exported="True" Id="96699a3149f64c679332fb82dc1e04d5" />
+			<ComponentItemProperties AssociatedEnvoyId="3b13fd8a45de42409553e4715ab9a6a4" Exported="True" Id="dfc8c9266fd64c5da6769fc70dc71c74" />
+			<ComponentItemProperties AssociatedEnvoyId="8fea2887f45d453c9ad2a162412bb090" Exported="True" Id="b3f062458b454856999233b124412fa2" />
+			<ComponentItemProperties AssociatedEnvoyId="2a3eca4119fc4abbb96de63659fb6f79" Exported="True" Id="731f97b63c804a09a6f49a1d227580cc" />
+			<ComponentItemProperties AssociatedEnvoyId="3e1e6b5ee0d940ee83fdea294f3013aa" Exported="True" Id="adcc1087a6ab43328b58f88dfe7b7598" />
+			<ComponentItemProperties AssociatedEnvoyId="9aff3da953db4dae877d1b9b458004ef" Exported="True" Id="7148c7c2be94e5596962f4f5bc67db5" />
+			<ComponentItemProperties AssociatedEnvoyId="b66da60a87a04a0ab0ddb8b343d8fa53" Exported="True" Id="d50b421ab83d497c9ab12557bdd92c2b" />
+			<ComponentItemProperties AssociatedEnvoyId="5065712207ea4e5c997515880d598360" Exported="True" Id="ea1e6322d6094a92a9b1e3c405e44703" />
+			<ComponentItemProperties AssociatedEnvoyId="be2a59a607a54bdabeb6f3c7a673c3dd" Exported="True" Id="415750c66d34494f85900a7c466f1158" />
+		</ComponentConfiguration>
+	</ComponentDefinition>
+	<EnvoyManagerFile Id="7470c07c65a940cc883b4ca3dc5cbb62" xmlns="http://www.ni.com/PlatformFramework">
+		<ProjectSettings Id="35edacf96cdb43788d0004565686f633" ModelDefinitionType="ProjectSettings" Name="ZProjectSettings" />
+		<EmbeddedDefinitionReference Id="102414f545274dcfab2a28f7b6a78e56" ModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentDefinitionEnvoyHierarchyRoot" Name="Global namespace">
+			<ComponentDefinitionEnvoyHierarchyRoot xmlns="http://www.ni.com/GComponent.xsd" />
+			<NameScopingEnvoy AutomaticallyResolveUp="True" Id="7439bcf559d24e19b3146054bdd5cb69" Name="otslm">
+				<NameScopingEnvoy AutomaticallyResolveUp="True" Id="d2f1b6b8f28c4379a8bce40f5eb60271" Name="simple">
+					<SourceFileReference Bindings="EnvoyManager" Id="cf6273ffecc24a608c31bc7c772df160" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="linear.mli" StoragePath="simple\linear.mli" />
+					<SourceFileReference Id="b0d23e5d99bc4cd19554b1fc34f214f4" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="linear.gvi" StoragePath="simple\linear.gvi" />
+					<SourceFileReference Bindings="EnvoyManager" Id="135e79c8037f4de2bdb7cf9f4d046084" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="spherical.mli" StoragePath="simple\spherical.mli" />
+					<SourceFileReference Id="3b13fd8a45de42409553e4715ab9a6a4" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="spherical.gvi" StoragePath="simple\spherical.gvi" />
+				</NameScopingEnvoy>
+				<NameScopingEnvoy AutomaticallyResolveUp="True" Id="f5f8560b2ec470e98326f3315728278" Name="tools">
+					<SourceFileReference Bindings="EnvoyManager" Id="d35433f5cd73477baf8d72ab38cd5abe" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="finalize.mli" StoragePath="tools\finalize.mli" />
+					<SourceFileReference Id="40c97f690a4e48408ed24368da69e38a" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="finalize.gvi" StoragePath="tools\finalize.gvi" />
+					<SourceFileReference Bindings="EnvoyManager" Id="8fea2887f45d453c9ad2a162412bb090" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="combine.mli" StoragePath="tools\combine.mli" />
+					<SourceFileReference Id="2a3eca4119fc4abbb96de63659fb6f79" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="combine.gvi" StoragePath="tools\combine.gvi" />
+				</NameScopingEnvoy>
+				<NameScopingEnvoy AutomaticallyResolveUp="True" Id="a443c12683564e9c9acbe6ec88b45124" Name="utils">
+					<NameScopingEnvoy AutomaticallyResolveUp="True" Id="78bebbb0cef24caa82f4084b4f74ae40" Name="ScreenDevice">
+						<SourceFileReference Id="3e1e6b5ee0d940ee83fdea294f3013aa" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="Close.gvi" StoragePath="utils\ScreenDevice\Close.gvi" />
+						<SourceFileReference Id="9aff3da953db4dae877d1b9b458004ef" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="Show.gvi" StoragePath="utils\ScreenDevice\Show.gvi" />
+						<SourceFileReference Id="b66da60a87a04a0ab0ddb8b343d8fa53" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="Delete.gvi" StoragePath="utils\ScreenDevice\Delete.gvi" />
+						<SourceFileReference Id="5065712207ea4e5c997515880d598360" ModelDefinitionType="NationalInstruments.LabVIEW.VI.Modeling.VirtualInstrument" Name="Construct.gvi" StoragePath="utils\ScreenDevice\Construct.gvi" />
+						<SourceFileReference Bindings="EnvoyManager" Id="be2a59a607a54bdabeb6f3c7a673c3dd" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="ScreenDevice.mli" StoragePath="utils\ScreenDevice\ScreenDevice.mli" />
+					</NameScopingEnvoy>
+				</NameScopingEnvoy>
+				<NameScopingEnvoy AutomaticallyResolveUp="True" Id="bdac9e6a44254ba2951e16e7e7e85e1d" Name="iter" />
+				<SourceFileReference Bindings="EnvoyManager" Id="e9bafd3520ce454c87196d2d538742e8" ModelDefinitionType="{http://www.ni.com/Matlab}MatlabDefinition" Name="initOtslm.mli" StoragePath="initOtslm.mli" />
+			</NameScopingEnvoy>
+		</EmbeddedDefinitionReference>
+		<NameScopingEnvoy Id="6b4a4392858f47ccbd3537952d0e201f" ModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentDefinitionContentReferenceRoot" Name="otslm.gcomp" NameTracksFileName="True">
+			<ComponentDefinitionContentReferenceRoot xmlns="http://www.ni.com/GComponent.xsd" />
+			<ContentReference ContentIdentifier="a5486d61f989469e88b92533c387e32d" Id="2a21b1c1a50f439287b816ebd8dfbace" Name="Configuration1" OverridingModelDefinitionType="{http://www.ni.com/GComponent.xsd}ComponentConfiguration" />
+		</NameScopingEnvoy>
+	</EnvoyManagerFile>
+</SourceFile>

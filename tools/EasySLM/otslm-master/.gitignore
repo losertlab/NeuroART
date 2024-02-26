@@ -1,0 +1,10 @@
+
+*.swp
+*.swo
+*~
+*.asv
+*.mexa64
+*.pyc
+*.mexw64
+
+.DS_Store
