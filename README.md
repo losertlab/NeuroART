@@ -136,10 +136,10 @@ to continue with the real-time analysis!
 <img src="images/realtimestart.png"  width="400" height=auto>
 </p>
 
-10. (update this) The figure below indicates different features of the NeuroART GUI, which can be useful during the real-time analysis.
+10. The figure below indicates different features of the NeuroART GUI, which can be useful during the real-time analysis.
 
 <p align="center">
-<img src="images/gui.png"  width="400" height=auto>
+<img src="images/Fig1.png"  width="400" height=auto>
 </p>
 
 Use the slider at the bottom left corner to adjust the correlation analysis window size while the images are being acquired.
