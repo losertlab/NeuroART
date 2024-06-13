@@ -90,7 +90,7 @@ In this case you have to save the image frames captured through the ThorImage so
 3. The first input dialog will appear on the screen as shown below.
 
 <p align="center">
-<img src="images/dialog1.png"  width="300" height=auto>
+<img src="images/dialog1.PNG"  width="300" height=auto>
 </p>
 
 - *Average neuron radius*: in microns
@@ -115,10 +115,14 @@ After inputting all the parameters, click “Continue”.
 
 4. If you selected CaImAN as the cell finding method, you will be directed to a separate window asking for the parameters to be used by the CaImAn cell finder. If you are satisfied with the default parameters, click "OK". Otherwise, modify the parameters before clicking "OK".
 
-5. Next, specify the initial batch of frames (IDs of starting and ending frames) for cell identification. Make sure that the *length of the initial batch* is greater than or equal to the *DF/F display width*. Also, provide the *maximum number of frames* that will be collected during the experiment. This will be used as an upper bound for the total number of frames. Therefore, just provide an approximate number for this field.
+<p align="center">
+<img src="images/CaImAn.PNG"  width="200" height=auto>
+</p>
+
+6. Next, specify the initial batch of frames (IDs of starting and ending frames) for cell identification. Make sure that the *length of the initial batch* is greater than or equal to the *DF/F display width*. Also, provide the *maximum number of frames* that will be collected during the experiment. This will be used as an upper bound for the total number of frames. Therefore, just provide an approximate number for this field.
 
 <p align="center">
-<img src="images/dialog2.png"  width="200" height=auto>
+<img src="images/dialog2.PNG"  width="200" height=auto>
 </p>
 
 - *Figure updating frequency*: How frequently the figures/plots need to be updated in the GUI. (e.g., every 30 frames)
@@ -132,20 +136,20 @@ file and the “pSignal” file.
 7. If you selected the manual cell finding method on step 3, here you will manually select the cells which are visible in the mean image. Click on all the cell centers that you would like to analyze and press the “Enter” key once cell clicking is complete. Press the “delete” key if you want to undo the previous click.
 
 <p align="center">
-<img src="images/manual.png"  width="400" height=auto>
+<img src="images/manual1.PNG"  width="400" height=auto>
 </p>
 
 8. Wait until all the frames in the initial batch are motion corrected, denoised and ΔF/F traces are calculated for all the identified cells. After completion of these steps, Real-time visualization will start. 
 
 <p align="center">
-<img src="images/realtime.png"  width="400" height=auto>
+<img src="images/realtime1.PNG"  width="400" height=auto>
 </p>
 
 9. Select, “Start Real Time Analysis”
 to continue with the real-time analysis!
 
 <p align="center">
-<img src="images/realtimestart.png"  width="400" height=auto>
+<img src="images/realtimestart1.PNG"  width="400" height=auto>
 </p>
 
 10. The figure below indicates different features of the NeuroART GUI, which can be useful during the real-time analysis.
