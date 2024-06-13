@@ -69,15 +69,15 @@ Open cmd in the NeuroART folder and run the following commands:
 
 ## Imaging system specific guidelines
 
-# If imaging is done using ScanImage:
+### If imaging is done using ScanImage:
 In this case, a global variable needs to be added to the ScanImage MATLAB script that serves as the file identifier to the raw file that saves the images during live acquisition. Furthermore, three more lines of code (as shown below) need to be added to the ScanImage software to write each acquired frame to the designated raw file (in 16 bit unsigned integer format) during imaging. Make sure that the "save" checkbox in scanimage is unchecked, as we are writing the frames to a separate "raw" file. You will also have to find the z focus for imaging, prior to the start of this experiment.
 
 If you need to perform real-time photostimulation, make sure to add the corresponding calibration file to the "calibration" subfolder. This calibration file should contain the coordinate transformation from the imaging plane to the coordinates used by the SLM (Spatial Light Modulator) or the DMD (Digital Micromirror Device).
 
-# If imaging is done using a Bruker Ultima 2P+ microscope:
+### If imaging is done using a Bruker Ultima 2P+ microscope:
 Bruker Ultima microscopes do not allow users to access image files during live acquisition. Furthermore, their proprietary image format makes it difficult to read in real-time. Therefore, we provide a separate MATLAB function (“BrukerReadWriteRaw.m”) that is used to transfer images acquired through the PrairieView software to the analysis computer via a TCP/IP link. Each of these frames are saved to a single raw binary file (16 bit unsigned integer format), which is accessed by NeuroART during imaging (detailed instructions are provided in the attached readme file).
 
-# If imaging is done using a Thorlabs B-Scope (Bergamo II series, B248):
+### If imaging is done using a Thorlabs B-Scope (Bergamo II series, B248):
 In this case you have to save the image frames captured through the ThorImage software to a single raw binary file in 16 bit unsigned integer format.
 
 ## Instructions for Running the NeuroART application
