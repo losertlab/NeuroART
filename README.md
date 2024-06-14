@@ -94,10 +94,12 @@ Furthermore, one more line of code (as shown below) need to be added to the Scan
         end
   
 - Uncomment the above fwrite command only when scanimage is ready for image aquisition and x, y coordinates and z focus are already set for imaging. Make sure to uncomment this line before starting the real-time image analysis experiment.
-- Make sure that the "save" checkbox in scanimage is unchecked, since we are writing the frames to a separate "raw" file. You will also have to find the z focus for imaging, prior to the start of this experiment.
+- Make sure that the "save" checkbox in the scanimage main controls window is unchecked, since we are writing the frames to a separate "raw" file.  
 - Once, all the above steps are completed and the correct channel is selected for display, set the number of frames and click the "Loop" button in the Main Controls window of ScanImage.
 
-
+<p align="center">
+<img src="images/SI.PNG"  width="300" height=auto>
+</p>
 
 It is recommended to run the ScanImage software in a separate MATLAB instance, and to run NeuroART in another MATLAB window for speed.
 
