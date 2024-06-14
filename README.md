@@ -79,10 +79,10 @@ A global variable needs to be accessed by the ScanImage MATLAB script that serve
 - As shown below, add the fileID to the properties(SetObservable)section, listed under "Acquisition duration parameters" (line 28)\
   
       properties (SetObservable)\
-      > acqsPerLoop = 1;                        % Number of independently started/triggered acquisitions when in LOOP mode\
-      > loopAcqInterval = 10;                   % Time in seconds between two LOOP acquisition triggers, for self/software-triggered mode.\
-      > focusDuration = Inf;                    % Time, in seconds, to acquire for FOCUS acquisitions. Value of inf implies to focus indefinitely.\
-      > fileID = evalin('base', 'fileID');      % This is added to enable writing images to a raw file.\
+      &nbsp;&nbsp; acqsPerLoop = 1;                        % Number of independently started/triggered acquisitions when in LOOP mode\
+      &nbsp;&nbsp; loopAcqInterval = 10;                   % Time in seconds between two LOOP acquisition triggers, for self/software-triggered mode.\
+      &nbsp;&nbsp; focusDuration = Inf;                    % Time, in seconds, to acquire for FOCUS acquisitions. Value of inf implies to focus indefinitely.\
+      &nbsp;&nbsp; fileID = evalin('base', 'fileID');      % This is added to enable writing images to a raw file.\
       end
 
 Furthermore, one more line of code (as shown below) need to be added to the ScanImage software to write each acquired frame to the designated raw file (in 16 bit unsigned integer format) that you have created above. 
