@@ -79,9 +79,9 @@ A global variable needs to be accessed by the ScanImage MATLAB script that serve
 - As shown below, add the fileID to the properties(SetObservable) section, listed under "Acquisition duration parameters" (line 28)
   
       properties (SetObservable)
-       acqsPerLoop = 1;                        % Number of independently started/triggered acquisitions when in LOOP mode
-       loopAcqInterval = 10;                   % Time in seconds between two LOOP acquisition triggers, for self/software-triggered mode.
-       focusDuration = Inf;                    % Time, in seconds, to acquire for FOCUS acquisitions. Value of inf implies to focus indefinitely.
+       acqsPerLoop = 1;                        
+       loopAcqInterval = 10;                   
+       focusDuration = Inf;                    
        fileID = evalin('base', 'fileID');      % This is added to enable writing images to a raw file.
       end
 
@@ -99,9 +99,9 @@ Furthermore, one more line of code (as shown below) need to be added to the Scan
 
 
 
-It is recommended to run the ScanImage software in a separate MATLAB instance, and to run neuroART in another MATLAB window for speed.
+It is recommended to run the ScanImage software in a separate MATLAB instance, and to run NeuroART in another MATLAB window for speed.
 
-If you need to perform real-time photostimulation, make sure to add the corresponding calibration file to the "calibration" subfolder. This calibration file should contain the coordinate transformation from the imaging plane to the coordinates used by the SLM (Spatial Light Modulator) or the DMD (Digital Micromirror Device).
+If you need to perform real-time photostimulation, make sure to add the corresponding calibration files to the "calibration" subfolder. This calibration file should contain the coordinate transformations from the imaging plane to the coordinates used by the SLM (Spatial Light Modulator) or the DMD (Digital Micromirror Device).
 
 
 ### If imaging is done using a Bruker Ultima 2P+ microscope:
