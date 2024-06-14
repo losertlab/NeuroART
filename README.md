@@ -26,7 +26,7 @@ e.g. The following should be listed:
 
 ## Installation 
 
-Clone this repository or download the folder that contains all the files required to run NeuroART.
+Download the folder that contains all the MATLAB codes and files required to run NeuroART.
 
 ### Modules
 
