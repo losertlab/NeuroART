@@ -76,7 +76,7 @@ A global variable needs to be accessed by the ScanImage MATLAB script that serve
       rawfile = 'D:\NeuroART\test.raw'; 
       fileID = fopen(rawfile, 'w');
 - Go to the file, \\+scanimage\SI.m in the ScanImage folder
-- As shown below, add the fileID to the properties(SetObservable)section, listed under "Acquisition duration parameters" (line 28)
+- As shown below, add the fileID to the properties(SetObservable) section, listed under "Acquisition duration parameters" (line 28)
   
       properties (SetObservable)
        acqsPerLoop = 1;                        % Number of independently started/triggered acquisitions when in LOOP mode
@@ -87,10 +87,12 @@ A global variable needs to be accessed by the ScanImage MATLAB script that serve
 
 Furthermore, one more line of code (as shown below) need to be added to the ScanImage software to write each acquired frame to the designated raw file (in 16 bit unsigned integer format) that you have created above. 
 - Add the following line of code (commented out initially) to the "SEND FRAMES TO DISPLAY BUFFER" section of the "zzzFrameAcquiredFcn" callback function (line 1144).
+  
         if stripeData.endOfFrame
           obj.hUserFunctions.notify('frameAcquired');
           % fwrite(obj.fileID, obj.hDisplay.lastFrame{1,1}, 'uint16', 'ieee-le'); % write the current frame to the raw file
         end
+  
 - Uncomment the above fwrite command only when scanimage is ready for image aquisition and x, y coordinates and z focus are already set for imaging. Make sure to uncomment this line before starting the real-time image analysis experiment.
 - Make sure that the "save" checkbox in scanimage is unchecked, since we are writing the frames to a separate "raw" file. You will also have to find the z focus for imaging, prior to the start of this experiment.
 - Once, all the above steps are completed and the correct channel is selected for display, set the number of frames and click the "Loop" button in the Main Controls window of ScanImage.
