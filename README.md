@@ -70,9 +70,36 @@ Open cmd in the NeuroART folder and run the following commands:
 ## Imaging system specific guidelines
 
 ### If imaging is done using ScanImage:
-In this case, a global variable needs to be added to the ScanImage MATLAB script that serves as the file identifier to the raw file that saves the images during live acquisition. Furthermore, three more lines of code (as shown below) need to be added to the ScanImage software to write each acquired frame to the designated raw file (in 16 bit unsigned integer format) during imaging. Make sure that the "save" checkbox in scanimage is unchecked, as we are writing the frames to a separate "raw" file. You will also have to find the z focus for imaging, prior to the start of this experiment.
+A global variable needs to be accessed by the ScanImage MATLAB script that serves as the file identifier to the raw file that saves the images during live acquisition. 
+- Add the ScanImage folder to MATLAB path
+- Create and open a raw file to save the acquired images as follows (replace the folder path accordingly):
+      rawfile = 'D:\NeuroART\test.raw'; 
+      fileID = fopen(rawfile, 'w');
+- Go to the file, \+scanimage\SI.m in the ScanImage folder
+- As shown below, add the fileID to the properties(SetObservable)section, listed under "Acquisition duration parameters" (line 28)
+      properties (SetObservable)
+        acqsPerLoop = 1;                        % Number of independently started/triggered acquisitions when in LOOP mode
+        loopAcqInterval = 10;                   % Time in seconds between two LOOP acquisition triggers, for self/software-triggered mode.
+        focusDuration = Inf;                    % Time, in seconds, to acquire for FOCUS acquisitions. Value of inf implies to focus indefinitely.
+        fileID = evalin('base', 'fileID');      % This is added to enable writing images to a raw file.
+      end
+
+Furthermore, one more line of code (as shown below) need to be added to the ScanImage software to write each acquired frame to the designated raw file (in 16 bit unsigned integer format) that you have created above. 
+- Add the following line of code (commented out initially) to the "SEND FRAMES TO DISPLAY BUFFER" section of the "zzzFrameAcquiredFcn" callback function (line 1144).
+        if stripeData.endOfFrame
+          obj.hUserFunctions.notify('frameAcquired');
+          % fwrite(obj.fileID, obj.hDisplay.lastFrame{1,1}, 'uint16', 'ieee-le'); % write the current frame to the raw file
+        end
+- Uncomment the above fwrite command only when scanimage is ready for image aquisition and x, y coordinates and z focus are already set for imaging. Make sure to uncomment this line before starting the real-time image analysis experiment.
+- Make sure that the "save" checkbox in scanimage is unchecked, since we are writing the frames to a separate "raw" file. You will also have to find the z focus for imaging, prior to the start of this experiment.
+- Once, all the above steps are completed and the correct channel is selected for display, set the number of frames and click the "Loop" button in the Main Controls window of ScanImage.
+
+
+
+It is recommended to run the ScanImage software in a separate MATLAB instance, and to run neuroART in another MATLAB window for speed.
 
 If you need to perform real-time photostimulation, make sure to add the corresponding calibration file to the "calibration" subfolder. This calibration file should contain the coordinate transformation from the imaging plane to the coordinates used by the SLM (Spatial Light Modulator) or the DMD (Digital Micromirror Device).
+
 
 ### If imaging is done using a Bruker Ultima 2P+ microscope:
 Bruker Ultima microscopes do not allow users to access image files during live acquisition. Furthermore, their proprietary image format makes it difficult to read in real-time. Therefore, we provide a separate MATLAB function (“BrukerReadWriteRaw.m”) that is used to transfer images acquired through the PrairieView software to the analysis computer via a TCP/IP link. Each of these frames are saved to a single raw binary file (16 bit unsigned integer format), which is accessed by NeuroART during imaging (detailed instructions are provided in the attached readme file).
