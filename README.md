@@ -110,7 +110,7 @@ If you need to perform real-time photostimulation, make sure to add the correspo
 Bruker Ultima microscopes do not allow users to access image files during live acquisition. Furthermore, their proprietary image format makes it difficult to read in real-time. Therefore, we provide a separate MATLAB function (“BrukerReadWriteRaw.m”) that is used to transfer images acquired through the PrairieView software to the analysis computer via a TCP/IP link. Each of these frames are saved to a single raw binary file (16 bit unsigned integer format), which is accessed by NeuroART during imaging (detailed instructions are provided in the attached readme file).
 
 ### If imaging is done using a Thorlabs B-Scope (Bergamo II series, B248):
-In this case you have to save the image frames captured through the ThorImage software to a single raw binary file in 16 bit unsigned integer format.
+In this case you should save the image frames captured through the ThorImage software to a single raw binary file in 16 bit unsigned integer format, which is the default format without any modifications to the ThorImage software. During our system tests, this file was written directly to a Synology network- attached storage (NAS) server via a 10Gb ethernet connection. Simultaneously, an analysis computer running NeuroART reads this file from the NAS location as the acquisition computer is appending new images to the file.
 
 ## Instructions for Running the NeuroART application
 
