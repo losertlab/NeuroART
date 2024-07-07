@@ -128,7 +128,7 @@ In this case you should save the image frames captured through the ThorImage sof
 - *Average neuron radius*: in microns
 - *DF/F display width*: The number of frames of which you would like to observe the ΔF/F traces at a given time. (i.e., The length of the ΔF/F traces to be displayed in the app window). Please make sure that this number does not exceed the number of frames you are planning to collect as the initial batch for identifying cell coordinates.
 - *Experiment ID*: Output variables will be saved as a .mat file under this name.
-- *Image folder*: The folder where the image frames will be saved in real-time. You will be prompted to select the folder once you click on this text field (click only once).
+- *Image folder*: The folder where the image frames will be saved in real-time. You will be prompted to select the folder once you click on this text field (click only once, do not double click).
 - *Image file name*: The name of the image file (This can be either a RAW file or a TIF stack). It is not necessary to have this file while providing input parameters. The app will wait until this file appears in the folder specified as the “Image folder”. Do not include the file extension here, only type the name of the file.
 - *Image format*: RAW/TIF
 - *Imaging system*: The name of the imaging system. If all the frames are already available and you only need to analyze data, please select “Offline Mode”.
