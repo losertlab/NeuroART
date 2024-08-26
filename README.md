@@ -107,7 +107,27 @@ If you need to perform real-time photostimulation, make sure to add the correspo
 
 
 ### If imaging is done using a Bruker Ultima 2P+ microscope:
-Bruker Ultima microscopes do not allow users to access image files during live acquisition. Furthermore, their proprietary image format makes it difficult to read in real-time. Therefore, we provide a separate MATLAB function (“BrukerReadWriteRaw.m”) that is used to transfer images acquired through the PrairieView software to the analysis computer via a TCP/IP link. Each of these frames are saved to a single raw binary file (16 bit unsigned integer format), which is accessed by NeuroART during imaging (detailed instructions are provided in the attached readme file).
+Bruker Ultima microscopes do not allow users to access image files during live acquisition. Furthermore, their proprietary image format makes it difficult to read in real-time. Therefore, we provide a separate MATLAB function (“BrukerReadWriteRaw.m”) that is used to transfer images acquired through the PrairieView software to the analysis computer via a TCP/IP link. Each of these frames are saved to a single raw binary file (16 bit unsigned integer format), which is accessed by NeuroART during imaging.
+
+To integrate the software with your Bruker 2P+ microscope, please follow these steps:
+- For ease of use, we have separated the two files necessary for initializing the Bruker microscope to save acquired frames as a raw file.
+- Copy the files “BrukerInit.m” and “BrukerReadWriteRaw.m” into the directory where you intend to save the raw file. This should be on the same computer running the Prairie Link software.
+- Configure all required image acquisition parameters in the Prairie Link software.
+- Navigate to the “NeuroART” folder and execute the main script, “main.m”.
+- Input the necessary parameters as per the provided user guidelines. Select Bruker Ultima 2P+ as the imaging system and “raw” as the image format. Also, ensure that the correct image folder is selected (do not proceed by clicking the “continue” button yet).
+- Open a separate MATLAB instance, load the “BrukerInit.m” script, and update the necessary user parameters. Ensure that the “rawfile” input parameter matches exactly with the file name provided in the NeuroART user input dialog.
+- Begin the image acquisition through the Prairie Link software.
+- Immediately after starting the acquisition, run the “BrukerInit.m” MATLAB script.
+- This script will create an empty raw file and begin writing the incoming image frames from the live acquisition.
+- Now, click “continue” in the NeuroART software to proceed with real-time analysis.
+ 
+#### Alternative Method
+If you encounter any performance issues due to running multiple software tools (Prairie Link, NeuroART, and BrukerInit.m) on a system with limited memory resources, you may opt to run NeuroART on a separate computer or laptop.
+For this alternative approach:
+- Ensure that the secondary computer or laptop running the NeuroART software has a stable network connection to the computer where the Prairie Link software and image acquisition are active.
+- Mount the drive containing the raw image frames on the secondary computer or laptop by mapping the shared folder from the imaging computer as a network drive.
+- Ensure that file sharing is enabled on the imaging computer and that permissions are correctly set to share the folder containing the image file.
+- When prompted to select the imaging folder in NeuroART, be sure to select the mapped network drive.
 
 ### If imaging is done using a Thorlabs B-Scope (Bergamo II series, B248):
 In this case you should save the image frames captured through the ThorImage software to a single raw binary file in 16 bit unsigned integer format, which is the default format without any modifications to the ThorImage software. During our system tests, this file was written directly to a Synology network- attached storage (NAS) server via a 10Gb ethernet connection. Simultaneously, an analysis computer running NeuroART reads this file from the NAS location as the acquisition computer is appending new images to the file.
