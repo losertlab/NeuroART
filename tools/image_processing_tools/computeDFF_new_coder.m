@@ -352,8 +352,8 @@ normF = normF'; % added by dulara on 05/24/2020
 % winsize = round(exptVars.frameRate * winSizeSeconds);
 
 percent = percentBaselineSub;
-DFF.smooth = slideWinSub(npSubFluoSmooth',winsize,percent);
-DFF.raw = slideWinSub(normF,winsize,percent);
+DFF.smooth = slideWinSub(npSubFluoSmooth',winsize,percent,1);
+DFF.raw = slideWinSub(normF,winsize,percent,1);
 
 % convert to sparse matrices for efficiency during real time analysis
 
