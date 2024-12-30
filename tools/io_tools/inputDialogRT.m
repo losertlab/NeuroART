@@ -14,7 +14,7 @@ function inputParams = inputDialogRT(inputConfig)
     Options.FontSize = 9;
     Options.Interpreter = 'tex';
     Options.CancelButton = 'on';
-    Options.ApplyButton = 'on';
+    Options.ApplyButton = 'off';
     Options.AlignControls = 'on';
     Options.ButtonNames = {'Continue','Cancel'}; 
     Prompt = {};
@@ -131,6 +131,12 @@ function inputParams = inputDialogRT(inputConfig)
     Formats(16,1).format = 'integer';
     Formats(16,1).labelloc = 'leftmiddle';
     Formats(16,1).size = 50;
+
+    Prompt(end+1,:) = {'Imaging Frame Rate', 'FR','fps'};
+    Formats(17,1).type = 'edit';
+    Formats(17,1).format = 'integer';
+    Formats(17,1).labelloc = 'leftmiddle';
+    Formats(17,1).size = 50;
     
     % Prompt(end+1,:) = {'Imaging Frequency','FQ','Hz'};
     % Formats(7,1).type = 'edit';
@@ -148,7 +154,7 @@ function inputParams = inputDialogRT(inputConfig)
 
     inputParams.symmFlag = 1; % 2             % 1 ->symmetric, 2->asym, T = frame time, Tau -> 1.5
     inputParams.smoothWin = 9; %3             % window size used to smooth fluorescence intensity (F) traces
-    inputParams.winSizeSeconds = 20; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
+    inputParams.winSizeSeconds = 30; %5       % the window size (in seconds) considered to calculate the baseline fluorescence intensity
     inputParams.fluorPercentile = 50; % percentile considered to calculate the baseline fluorescence intensity
     inputParams.dftResolution = 1;
     inputParams.imageFile = [inputParams.IMGFOLDER, filesep, inputParams.IMG, inputParams.FORMAT]; % The file that contains all the images

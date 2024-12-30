@@ -6,7 +6,7 @@ function batchSettings = batchSettingsDialog(inputParams)
     % Updated for additional functions F. Hatz 2013
     
     def_initialBatchSize = 601; % default values for the input dialog
-    def_BatchSize = 1000;
+    def_BatchSize = 2340;
     Title = 'Initial Batch Settings';
     %%%% SETTING DIALOG OPTIONS
     % Options.WindowStyle = 'modal';
@@ -14,7 +14,7 @@ function batchSettings = batchSettingsDialog(inputParams)
     Options.FontSize = 9;
     Options.Interpreter = 'tex';
     Options.CancelButton = 'on';
-    Options.ApplyButton = 'on';
+    Options.ApplyButton = 'off';
     Options.AlignControls = 'on';
     Options.ButtonNames = {'Continue','Cancel'}; 
     Prompt = {};
