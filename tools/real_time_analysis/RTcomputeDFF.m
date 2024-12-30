@@ -59,21 +59,12 @@ tst = tic;
 
 %% apply assymetrical (exponential) filter to traces - smoothing - MODIFIED FROM PLENZ LAB AVALANCHE CODE
 
-% fluoAllSmooth = zeros(n,smoothwin+1); % e.g. smooth fluorecence values of the last 10 frames
+% DZ042924 - removed smoothing to get more information on timing of photostimulation
 
-for j = 1:n % n = number of good ROIs
-    smraw = smooth2(Fraw(j,end-smoothwin:end),symmFLAG,smoothwin,T,1.5); 
-    Fraw(j,end-smoothwin+1:end) = smraw(1:smoothwin);
-    
-%     if FrameID < smoothwin
-%         smraw = smooth2(Fraw(j,end-smoothwin:end),symmFLAG,smoothwin,T,1.5); 
-%         Fraw(j,end-FrameID:end) = smraw(end);
-%     else
-%         Fraw(j,end-smoothwin:end) = smooth2(Fraw(j,end-smoothwin:end),symmFLAG,smoothwin,T,1.5); %Maybe smooth after DFF calc 
-%     end
-    
-%     fluoAllSmooth(j,:) = smraw(end-winsize+1:end);
-end
+% for j = 1:n % n = number of good ROIs
+%     smraw = smooth2(Fraw(j,end-smoothwin:end),symmFLAG,smoothwin,T,1.5); 
+%     Fraw(j,end-smoothwin+1:end) = smraw(1:smoothwin);
+% end
 
 newDFF = zeros(n,smoothwin);
 
