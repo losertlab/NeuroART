@@ -25,10 +25,13 @@ function G = getMST(pairRelationships)
     S = sparse(pairRelationships); % 2018: had to flip I and J due to changes I made to pairwiseDist()
     
     % Calculate MST (Prim's algorithm -- best when #edges >> #nodes)
-    [tree,~] = graphminspantree(S,'Method','Prim');
+    [G,~] = minspantree(graph(S,'lower'),'Method','dense');  % DZ 030424 --> for older versions use [tree, ~] = graphminspantree(S,'Method','Prim')
+    
     
     % Extract graph structure and tree for output
-    G = graph(tree,'lower'); % commented by dulara 05/06/2020
+    % G = graph(tree,'lower'); % commented by dulara 03/04/2024, only for MATLAB versions older than 2022
+
+
 %     outputTree{s} = tree;
     
     % Get length of tree (could maybe omit and pull from G later) % commented by dulara 05/06/2020
