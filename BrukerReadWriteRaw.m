@@ -41,7 +41,7 @@ save(strcat('exptVars_',exptId,'.mat'),'exptVars');
 if totalSamplesPerFrame==0 , disp("Error linking to Prairie View !!!"); delete(pl);return;
 end
 
-if scope == 3  % Generate .raw file from aquired data
+if (scope == 2) || (scope == 3)  % Generate .raw file from aquired data (only if Bruker Ultima is selected as the imaging system)
 
     %limit buffer size to approximately one frame so that matlab is not
     %overwhelmed by incoming stream of data and drops frames

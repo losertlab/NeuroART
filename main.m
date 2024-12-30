@@ -29,7 +29,7 @@ end
 inputConfig = extractJSON(configFileName);
 
 % Initialize python environment.
-pythonInit();
+% pythonInit();
 
 genericErrorMessage = 'Error: ';
 
@@ -45,6 +45,12 @@ catch exception
 end
 
 %% SLM Initialization (for photostimulation when the SLM is available)
+if inputParams.CFIND == 2
+    caimanParams = caImAnParameters();
+    if isempty(caimanParams)
+        return; 
+    end
+end
 
 slmParams = slmInit(inputParams); % for Boulder Non-linear Systems (BNS) SLM
 
@@ -61,7 +67,7 @@ rfParams = rfDialog(inputParams); % select files for analyzing receptive fields 
 %% Reading experimental parameters and motion correction of the initial batch
 
 try
-    inputParams.frameRate = 15; % frameRate = 10, for images acquired from micromanager
+    inputParams.frameRate = inputParams.FR; % frameRate = 10, for images acquired from micromanager
     [exptTextOutput, exptVars] = evalc('exptVarsInit(inputParams, batchSettings)');
     if verbose, disp(exptTextOutput), end
 catch exception
@@ -72,10 +78,10 @@ end
 %% Read the frames in iteratively
 
 time = tic;
-if verbose, fprintf('Image registration started ... \n'),end
+if verbose, fprintf('Image acquisition started ... \n'),end
 
 % this function is quite large. Should be broken up into smaller pieces.
-[IMG, wait, frameid, fh,tstack] = readInitialBatch(inputParams,batchSettings,exptVars);
+[IMG, wait, frameid, fh,tstack,exptVars] = readInitialBatch(inputParams,batchSettings,exptVars);
 
 if wait == 10000
     promptMessage = sprintf('Number of acquired images is insufficient to achieve the specified size of the initial batch');
@@ -86,7 +92,7 @@ end
 aquisitionTime = toc(time);
 if verbose, fprintf('Initial aquisition took %.4f seconds\n',aquisitionTime), end
 
-% motion correction should  be independent of most experimental variables.
+% Motion correction should  be independent of most experimental variables.
 % We should adapt the inputs for this function to be reused outside of neuroart.
 [regImg,imTemplate,norm_meanRedIMG] = motionCorrection(IMG,exptVars,inputParams,batchSettings);
 
@@ -100,52 +106,7 @@ if verbose, fprintf('Registration took %.4f seconds\n',registrationTime - aquisi
     
 %% Detect centroids of the cells (ROIs)
 
-if inputParams.CFIND == 1 % Manual
-    figure; imagesc(normMeanIMG); colormap('gray'); axis('square'); caxis([0 0.75]);
-    selectText = ['Click on Neuron Centers...' newline 'Press Enter after all the cells are selected' newline 'Press delete if you want to deselect the last selected cell'];
-    if verbose, disp (selectText),end
-    [xc, yc] = getpts; %  manually select centers of the neurons
-    cell_centroids(:,1) = yc;
-    cell_centroids(:,2) = xc;
-    clear xc yc
-elseif inputParams.CFIND == 4 % From File
-    [file,path] = uigetfile; % select the .mat file which contains the variable, "ptsIdx": column 2 --> x, column 3 --> y coordinates
-    if file == 0
-        fprintf('No file was selected ... \n');
-        return;
-    else
-        load([path file],'cell_centroids');
-    end
-elseif inputParams.CFIND == 3 % Cite-on
-%     system('activate cite-on & python test.py')
-    ups = 2.0; % upscaling factor
-    th = 0.5;  % threshold
-    [~,cmdOutput] = system(['activate cite-on & python citeon.py' ' -x ' num2str(exptVars.dimX) ' -y ' num2str(exptVars.dimY) ' -n ' num2str(length(batchSettings.frameBlock)) ' -p ' inputParams.imageFile ' -u ' num2str(ups) ' -t ' num2str(th)]);
-    T = readtable('cell_coordinates.csv');
-    clear cell_centroids; % clear previously loaded cell coordinates
-    cell_centroids(:,1) = T.Var2; %yc
-    cell_centroids(:,2) = T.Var1; %xc 
-elseif inputConfig.python.use_python && inputParams.CFIND == 2
-    cell_centroids = locateCentroids(inputConfig.python.complex_dynamics_path, inputConfig.python.env);
-else
-    caimanParams.tau = exptVars.rPixels;    % number of components to be found *
-    caimanParams.K = 185;                   % number of components to be found *
-    caimanParams.decayTime = 50;            % typical transient time  *
-    caimanParams.pOrder = 2;                % order of AR dynamics    *
-    caimanParams.nBackground = 2;           % number of background components    *
-    caimanParams.minSnr = 2;                % minimum SNR threshold
-    caimanParams.mergeThr = 0.8;            % merging threshold       *
-    caimanParams.spaceThr = 0.3;            % space correlation threshold (dataset3 --> 0.3)
-    caimanParams.cnnThr = 0.2;              % threshold for CNN classifier 
-    caimanParams.frameRate = exptVars.frameRate;
-    
-    if ~verbose
-        [caimanTextOutput,cell_centroids,~,~,~] = evalc('CaImAn_CellFinder(regImg,caimanParams)'); % suppressing printed statements
-    else
-        [cell_centroids,~,~,~] = CaImAn_CellFinder(regImg,caimanParams); % CaImAn cell finder
-    end
-    
-end
+detectCentroidsOfCells;
 %%
 close(gcf);
 
@@ -161,13 +122,14 @@ delete(gcp('nocreate'));
     
 %% Compute DF/F
 
-neuropilSubPercent = 70; % use this default value for now
+neuropilSubPercent = 70; % use this default value for now (not needed for filled ROIs)
 
 % shorten parameter list (create struct dffInput, dffOutput...)
-% need work on the computeDFF functions. There is a lot to be done here.
+% need work on the computeDFF functions.
+
+exptVars.scope = inputParams.SCOPE; % needed for DF/F calculation depending on the requirement (one sided window for real-time: SCOPE 1 to 5, symmetric window for offline mode: SCOPE == 6)  
 
 if inputParams.ROI == 1 % no filled ROIs
-%     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(pwd,inputParams.EXID,regImg,exptVars,cell_centroids,imTemplate,exptVars.rPixels,exptVars.dffWindow/2,inputParams.fluorPercentile); 
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_new_coder(regImg,exptVars.frameRate,cell_centroids,exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile,neuropilSubPercent);   
 else
     [norm_meanIMG,roiBW2,npBWout,DFF,~,fluoAllSmooth,xcRaw,ycRaw,minNpSubFluo,maxAdjF] = computeDFF_filled(regImg,exptVars,cell_centroids(:,2),cell_centroids(:,1),exptVars.rPixels,floor(exptVars.dffWindow/2),inputParams.fluorPercentile); 
@@ -260,6 +222,8 @@ if inputParams.SLM == 2
     RTparams.SLM = "BNS";
 elseif inputParams.SLM == 3
     RTparams.SLM = "PrairieLink";
+elseif inputParams.SLM == 4
+    RTparams.SLM = "DMD";
 else
     RTparams.SLM = "None";
 end

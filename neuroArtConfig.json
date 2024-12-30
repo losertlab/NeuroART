@@ -1,0 +1,79 @@
+{
+  "default": {
+    "R": 3,
+    "DISPLAY": 300,
+    "EXID": "RT_test1",
+    "IMGFOLDER": ".\\data",
+    "IMG": "122122_FOV4_ET100_EM500_z14294_demo",
+    "FORMAT": 1,
+    "RF": 2,
+    "CFIND": 1,
+    "SCOPE": 1,
+    "NUMCHAN": 1,
+    "RCHAN": 2,
+    "SLM": 1,
+    "ROI": 2,
+    "NET": 1,
+    "CWIN": 1,
+    "CWINF": 5,
+    "FR":15
+  },
+  "options": {
+    "FORMAT": [
+      ".raw",
+      ".tif"
+    ],
+    "CFIND": [
+      "Manual",
+      "CaImAn",
+      "Cite-on",
+      "From File",
+      "Cell Pose"
+    ],
+    "SCOPE": [
+      "Thorlabs B-Scope",
+      "Bruker Ultima 2P+",
+      "Bruker Ultima 2P",
+      "BEAMM(ScanImage)",
+      "Nikon",
+      "Offline Mode"
+    ],
+    "NUMCHAN": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "RF": [
+      "Yes",
+      "No"
+    ],
+    "RCHAN": [
+      "Yes",
+      "No"
+    ],
+    "SLM": [
+      "None",
+      "BNS",
+      "PrairieLink",
+      "DMD"
+    ],
+    "ROI": [
+      "Not Filled",
+      "Filled"
+    ],
+    "NET": [
+      "MST",
+      "Correlations"
+    ],
+    "CWIN": [
+      "Cumulative",
+      "Fixed"
+    ]
+  },
+  "python": {
+    "complex_dynamics_path": "/path/to/complex_dynamics/src/",
+    "env": "a_conda_environment",
+    "use_python": true
+  }
+}

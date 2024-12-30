@@ -7,8 +7,8 @@ function [phaseMask,msk,I] = stimulateBNS_SLM(targetCells, stimParams)
 
 nTargets = size(targetCells,1); % Total number of cells to be stimulated
 slmdim = 1536;
-mult_factor = 1.5; % high pixel mode
-zoom_factor = 3/4; %1/6; % high pixel mode
+mult_factor = 1.25; % 1.5 for high pixel mode
+zoom_factor = 3/4; % 1/6; % high pixel mode
 
 % % Normalize
 % targetCells(:,1) = (targetCells(:,1)-(dimX/2))/(dimX/2);
@@ -54,7 +54,7 @@ if stimParams.VMode < 0 % consider negative values as disk shaped patterns, VMod
     m = pattern;
 
 else
-    [m, ~]=dhot(P, opts, 1);
+    [m, ~]=dhot(P, opts, 0);
 end
 
 opts.zernike = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];

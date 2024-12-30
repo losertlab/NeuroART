@@ -4,7 +4,7 @@ function exptVars = xmlVersionCheck(XML,numImagesOverwrite)
 % but some of the str names changed with newer versions therefore you have
 % to check every time a new version comes out anyway...
 if strcmp(XML.Children(10).Attributes.Value,'4.0.2020.2171')||strcmp(XML.Children(10).Attributes.Value,'4.0.2019.8191')
-    fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value);
+%     fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value);
     exptVars.dimX = str2double(XML.Children(26).Attributes(36).Value); % in pixels
     exptVars.dimY = str2double(XML.Children(26).Attributes(37).Value);
     exptVars.numImages = str2double(XML.Children(42).Attributes(7).Value);
@@ -35,10 +35,10 @@ if strcmp(XML.Children(10).Attributes.Value,'4.0.2020.2171')||strcmp(XML.Childre
             fprintf('Not sure how many channels used in set number %s,\n but most likely...\n',exptVars.ChannelEnableSet);
             exptVars.NumChannels = 3;
     end
-    fprintf('Number of channels used = %d\n',exptVars.NumChannels);
+%     fprintf('Number of channels used = %d\n',exptVars.NumChannels);
         
 elseif strcmp(XML.Children(10).Attributes.Value,'3.1.2017.10021')
-    fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
+%     fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
     exptVars.dimX = str2double(XML.Children(26).Attributes(31).Value); % in pixels
     exptVars.dimY = str2double(XML.Children(26).Attributes(32).Value);
     exptVars.numImages = str2double(XML.Children(42).Attributes(5).Value);
@@ -58,7 +58,7 @@ elseif strcmp(XML.Children(10).Attributes.Value,'3.1.2017.10021')
     end
     
 elseif strcmp(XML.Children(10).Attributes.Value,'3.0.2016.10131')
-    fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
+%     fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
     exptVars.dimX = str2double(XML.Children(26).Attributes(23).Value); % in pixels
     exptVars.dimY = str2double(XML.Children(26).Attributes(24).Value);
     exptVars.numImages = str2double(XML.Children(34).Attributes(5).Value); % FIX ***************
@@ -73,7 +73,7 @@ elseif strcmp(XML.Children(10).Attributes.Value,'3.0.2016.10131')
         exptVars.totalZplanes = 1;
     end
 elseif strcmp(XML.Children(10).Attributes.Value,'2.1.2014.9102') % Not using old ThorImage moving forward
-    fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
+%     fprintf('Experiment used ThorImage Version %s\n',XML.Children(10).Attributes.Value)
     exptVars.dimX = str2double(XML.Children(28).Attributes(16).Value); % in pixels
     exptVars.dimY = str2double(XML.Children(28).Attributes(16).Value);
     exptVars.dimXmicrons = str2double(XML.Children(22).Children(2).Children(2).Attributes(2).Value) *1000;

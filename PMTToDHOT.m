@@ -12,8 +12,8 @@ function P_DHOT = PMTToDHOT(xc,yc)
 %     calibrationFile = load(['.' filesep 'calibration' filesep '20230118_PMTSLMCalib_x7635y9420_2x.mat']); % for 2x zoom factor
 %     calibrationFile = load(['.' filesep 'calibration' filesep '20230118_PMTSLMCalib_x7635y9420_3x.mat']); % for 3x zoom factor
 
-    PMT2Cam = load(['.' filesep 'calibration' filesep '20240212_PMTCamCalib.mat']); % PMT to Camera calibration file
-    Cam2SLM = load(['.' filesep 'calibration' filesep '20240212_CamSLMCalib.mat']); % Camera to SLM calibration file
+    PMT2Cam = load(['.' filesep 'calibration' filesep '20240308_FOVCamCalib.mat']); % PMT to Camera calibration file
+    Cam2SLM = load(['.' filesep 'calibration' filesep '20240308_CamDMDCalib.mat']); % Camera to SLM calibration file
 
     neuronXY = [xc yc];
 
