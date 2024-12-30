@@ -2,8 +2,9 @@
 % Inputs: F       - raw fluorecense
 %         winsize - baseline window size
 %         percent - lower percent of baseline values to average
+%         scope - scope=6 for offline mode, real-time mode otherwise
 % Output: dFF     - relative change in fluorescense in percent
-function dFF = slideWinSub(F,winsize,percent)
+function dFF = slideWinSub(F,winsize,percent,scope)
 nRois = size(F,1);
 nFrames = size(F,2);
 dFF = zeros(size(F));
@@ -14,9 +15,17 @@ for j = 1 : nRois
     for k = 1 : nFrames
             lWin = 1;
             rWin = min(k+winsize, nFrames);
-            if k > winsize
-                lWin = max(1,k-2*winsize);
-                rWin = k;    
+
+            if scope==6  % offline mode
+                if k > winsize
+                    lWin = max(1,k-winsize);
+                    rWin = min(k+winsize, nFrames);    
+                end
+            else
+                if k > winsize
+                    lWin = max(1,k-2*winsize);
+                    rWin = k;    
+                end
             end
             percentWin = floor(percent/100*(rWin-lWin));
             tWin = sort(F(j,(lWin:rWin)),'ascend');
