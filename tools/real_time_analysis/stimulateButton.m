@@ -53,7 +53,13 @@
                     start(timerObj);
 
                 else
-                    [~,msk,I] = stimulateBNS_SLM(target_cells, stimParams); % send commands to BNS SLM
+                    zernike = readmatrix('zernike_coeffs.csv'); % read the zernike polynomial coefficients identified during aberration correction
+                    xy = readmatrix('phaseMaskCenter.csv'); % coordinates of the center of the phase mask that provides the most uniform vortex intensity pattern (identified using "centerPhaseMask.m")
+
+                    stimParams.xShift = xy(2);
+                    stimParams.yShift = xy(1);
+                    
+                    [~,msk,I] = stimulateBNS_SLM(target_cells, stimParams,zernike); % send commands to BNS SLM
                     for iter = 1:stimParams.niter
                         calllib('PiUsb', 'piSetShutterState', 1, app.stimShutter); % open USB shutter
                         pause(0.03); % stim. duration = 300ms (should be a user specified parameter in future)
@@ -75,6 +81,7 @@
                 stimParams.niter = app.IterationsEditField_2.Value;
                 stimParams.background = app.BackgroundIntensityEditField.Value;
                 stimParams.stimGroup = app.StimGroupEditField.Value; % id of the group that needs to be stimulated (test mode only)
+                stimParams.G1Size = app.Group1SizeEditField.Value; % number of cells selected from G1 for stimulation
 
                 stimulateNikonDMD(target_cells,target_cells_group2,stimParams); % calculate stimulation images and send stim. parameters to the DMD
 

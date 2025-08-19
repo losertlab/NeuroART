@@ -26,7 +26,7 @@
             DFFsmooth = horzcat(DFFsmooth,zeros(nROIs,app.batch_size));
             app.rawFluo = horzcat(app.rawFluo,zeros(nROIs,app.batch_size));
             
-            offSet = (upperLim-lowerLim)*2.5; % DZ 100422 multiply by 2.5 to reduce overlap
+            offSet = (upperLim-lowerLim)*1.2; % DZ 100422 multiply by 2.5 to reduce overlap
 
             x_val = 1:app.displayWin;
             
