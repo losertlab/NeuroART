@@ -12,6 +12,7 @@ function [success,cmdOutput] = stimulateNikonDMD(target_cells,target_cells_group
 % stimParams.niter: number of repetitions of the photostimulation paradigm
 % stimParams.background: background percentage 0 - 100 (if background = 20, 20% of the pixels will be turned on randomly)
 % stimParams.stimGroup: id of the group that needs to be stimulated (testmode only)
+% stimParams.G1Size: number of cells selected from G1 for stimulation
 
 success = 0;
 
@@ -19,11 +20,19 @@ success = 0;
 
 target_cells_DMD = CamToDMD(target_cells(:,1),target_cells(:,2));
 target_cells_group2_DMD = [];
+target_cells_group3_DMD = [];
+G1Size = stimParams.G1Size;
+
 
 if size(target_cells_group2,1) > 0 % there are two groups specified, only allow sequential stim if this is the case
 
     target_cells_group2_DMD = CamToDMD(target_cells_group2(:,1),target_cells_group2(:,2)); % do this conversion only if the second group has at least one cell
     nTargets = 2; % because there are only two groups, stimulate all the cells in group 1 and then all the cells in group 2
+
+    if G1Size < length(target_cells(:,1)) % stimulating a subset of G1
+        target_cells_DMD = CamToDMD(target_cells(1:G1Size,1),target_cells(1:G1Size,2));
+        target_cells_group3_DMD = CamToDMD(target_cells(G1Size+1:end,1),target_cells(G1Size+1:end,2)); % these additional cells will be excluded from the background
+    end
 
 elseif stimParams.seqMode % only group 1 is available, stimulate cells sequentially
 
@@ -51,8 +60,12 @@ if (T < nTargets*t)
     return
 end
 
-commandStr = sprintf('python dmdControl.py "%s" "%s" %d %d %d %d %d %d %d %d',jsonencode(target_cells_DMD),jsonencode(target_cells_group2_DMD),nTargets,radius,t,T,niter,testMode,background,stimGroup); % need to use jsonencode to format matrices to string
-[status,cmdOutput] = system(commandStr);
+% commandStr = sprintf('python dmdControl.py "%s" "%s" "%s" %d %d %d %d %d %d %d %d',jsonencode(target_cells_DMD),jsonencode(target_cells_group2_DMD),jsonencode(target_cells_group3_DMD),nTargets,radius,t,T,niter,testMode,background,stimGroup); % need to use jsonencode to format matrices to string
+% [status,cmdOutput] = system(commandStr);
+
+commandStr = sprintf('start /B python dmdControl.py "%s" "%s" "%s" %d %d %d %d %d %d %d %d',jsonencode(target_cells_DMD),jsonencode(target_cells_group2_DMD),jsonencode(target_cells_group3_DMD),nTargets,radius,t,T,niter,testMode,background,stimGroup); % need to use jsonencode to format matrices to string
+status = system(commandStr);
+cmdOutput = " ";
 
 if status ~= 0
     fprintf('Error calling dmdControl.py: %s\n',cmdOutput)

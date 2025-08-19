@@ -21,7 +21,7 @@ def send(sock,width, height,img):
         sock.sendall(np.uint32(height))
         sock.sendall(img)
 
-def create_image(matrix1,matrix2,matrix3,radius,background):
+def create_image(matrix1,matrix2, radius,background):
 
 
     width, height = 800, 500
@@ -65,16 +65,8 @@ def create_image(matrix1,matrix2,matrix3,radius,background):
     for center_x, center_y in matrix2:
         for x in range(max(int(center_x - 1.6*radius), 0), min(int(center_x + 1.6*radius) + 1, width)):
             for y in range(max(int(center_y - radius), 0), min(int(center_y + radius) + 1, height)):
-                if in_circle(center_x, center_y, x, y, radius+1):
+                if in_circle(center_x, center_y, x, y, radius):
                     image[y][x] = 0
-
-    # exclude additional cells in G1                
-    if len(matrix3) > 0: 
-        for center_x, center_y in matrix3:
-            for x in range(max(int(center_x - 1.6*radius), 0), min(int(center_x + 1.6*radius) + 1, width)):
-                for y in range(max(int(center_y - radius), 0), min(int(center_y + radius) + 1, height)):
-                    if in_circle(center_x, center_y, x, y, radius+1):
-                        image[y][x] = 0
 
 
 
@@ -100,23 +92,21 @@ def create_image(matrix1,matrix2,matrix3,radius,background):
     return image
 
 
-json_matrix1 = sys.argv[1]; # group 1 cell coordinates (stimulated)
+json_matrix1 = sys.argv[1]; # group 1 cell coordinates
 json_matrix2 = sys.argv[2]; # group 2 cell coordinates
-json_matrix3 = sys.argv[3]; # group 1 cell coordinates (not stimulated)
-nTargets = int(sys.argv[4]); # number of stim. targets
-radius = int(sys.argv[5]); # radius of stimulation spots in pixels
-t = int(sys.argv[6]); # pulse duration (in ms)
-T = int(sys.argv[7]); # interval between stimulation pulses (in ms)
-niter = int(sys.argv[8]); # number of iterations
-testMode = int(sys.argv[9]); # testMode = 1, in test mode, otherwise 0
-background = int(sys.argv[10]); # background intensity of the DMD pattern. Range: 0-255 (default: 0)
-stimGroup = int(sys.argv[11]); # id of the group that needs to be stimulated if the test mode is selected
+nTargets = int(sys.argv[3]); # number of stim. targets
+radius = int(sys.argv[4]); # radius of stimulation spots in pixels
+t = int(sys.argv[5]); # pulse duration (in ms)
+T = int(sys.argv[6]); # interval between stimulation pulses (in ms)
+niter = int(sys.argv[7]); # number of iterations
+testMode = int(sys.argv[8]); # testMode = 1, in test mode, otherwise 0
+background = int(sys.argv[9]); # background intensity of the DMD pattern. Range: 0-255 (default: 0)
+stimGroup = int(sys.argv[10]); # id of the group that needs to be stimulated if the test mode is selected
 
 # deserialize the JSON strings back to python
 
 cells_1 = json.loads(json_matrix1) # cell group 1
 cells_2 = json.loads(json_matrix2) # cell group 2
-cells_3 = json.loads(json_matrix3) # cell group 1 (not stimulated)
 
 if not isinstance(cells_1[0],list): # handle the case where there is only one cell in this group
         cells_1 = [cells_1]
@@ -141,13 +131,13 @@ blankFrame = convert(np.zeros((500, 800), dtype=np.uint8)) # all zeros displayed
 
 if len(cells_2) > 0:
         # Create images for both groups
-        frame1 = convert(create_image(cells_1,cells_2,cells_3,radius,background))
+        frame1 = convert(create_image(cells_1,cells_2,radius,background))
 
         if not isinstance(cells_2[0],list): # handle the case where there is only one cell in this group
                 cells_2 = [cells_2]
-        frame2 = convert(create_image(cells_2,cells_1,cells_3,radius,background))
+        frame2 = convert(create_image(cells_2,cells_1,radius,background))
         
-        delay = max(0,t) # minimum time required to switch between patterns is 10ms for this DMD
+        delay = max(0,t-10) # minimum time required to switch between patterns is 10ms for this DMD
 
         if testMode > 0:
                 for itr in range(niter):
@@ -174,8 +164,8 @@ if len(cells_2) > 0:
 
 elif nTargets == 1:
         # First group only, simultaneous stimulation
-        frame1 = convert(create_image(cells_1,cells_2,cells_3,radius,background))
-        delay = max(0,t) # minimum time required to switch between patterns is 10ms for this DMD
+        frame1 = convert(create_image(cells_1,cells_2,radius,background))
+        delay = max(0,t-10) # minimum time required to switch between patterns is 10ms for this DMD
         
         for itr in range(niter):
                 send(sock,width,height,frame1)
@@ -185,12 +175,12 @@ elif nTargets == 1:
                 time.sleep((T-t)/1000)
                 
 else:
-        delay = max(0,t) # minimum time required to switch between patterns is 10ms for this DMD + 5ms for image generation
+        delay = max(0,t-15) # minimum time required to switch between patterns is 10ms for this DMD + 5ms for image generation
         # First group only, sequential stimulation
         
         for itr in range(niter):
                 for xc,yc in cells_1:
-                        frame1 = convert(create_image([[xc,yc]],cells_2,cells_3,radius,background))
+                        frame1 = convert(create_image([[xc,yc]],cells_2,radius,background))
                         send(sock,width,height,frame1)
                         if delay > 0:
                                 time.sleep(delay/1000)

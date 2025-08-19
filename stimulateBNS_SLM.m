@@ -1,7 +1,9 @@
-function [phaseMask,msk,I] = stimulateBNS_SLM(targetCells, stimParams)
+function [phaseMask,msk,I] = stimulateBNS_SLM(targetCells, stimParams, zernike)
 
 % targetCells: x, y coordinates of the cells to be stimulated
 % (first column -> x, second column -> y)
+
+% zernike: Zernike polynomial coefficients
 
 % Created by Dulara De Zoysa, UMD on 5/13/2022
 
@@ -57,7 +59,7 @@ else
     [m, ~]=dhot(P, opts, 0);
 end
 
-opts.zernike = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+opts.zernike = zernike;
 [~, IMG]=dhot(P, opts, 1);  % added on 08/18/22 (calculated intensity pattern shows artifacts when zernike coefficients are non-zero)
 
 t = toc(tstart);

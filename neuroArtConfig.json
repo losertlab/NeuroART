@@ -5,18 +5,18 @@
     "EXID": "RT_test1",
     "IMGFOLDER": ".\\data",
     "IMG": "122122_FOV4_ET100_EM500_z14294_demo",
-    "FORMAT": 1,
+    "FORMAT": 2,
     "RF": 2,
-    "CFIND": 1,
-    "SCOPE": 1,
+    "CFIND": 5,
+    "SCOPE": 5,
     "NUMCHAN": 1,
     "RCHAN": 2,
-    "SLM": 1,
+    "SLM": 4,
     "ROI": 2,
     "NET": 1,
     "CWIN": 1,
     "CWINF": 5,
-    "FR":15
+    "FR":14
   },
   "options": {
     "FORMAT": [
